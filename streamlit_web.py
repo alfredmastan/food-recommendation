@@ -7,8 +7,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from gensim.models import Word2Vec
-
-
+from sklearn.metrics.pairwise import cosine_similarity
+from user_class import User
+import boto3
+from decimal import Decimal
 #-- Page Configuration
 st.set_page_config(layout="wide")
 
@@ -29,119 +31,139 @@ a:hover {
 }
 """, unsafe_allow_html=True)
 
-#-- Load Required Data and Models
-data = pd.read_pickle("processed_cookbook.pkl") # Load the main data
-model = Word2Vec.load("word2vec.model") # Load the pre-trained Word2Vec model
-
 #-- Helper Functions
-def reset_recommendation(n):
-    """
-    Initialize or Overwrite recipes to display
-    """
-    # st.session_state["display_recipe_indices"] = np.random.choice(len(data), n, replace=False)
-    st.session_state["display_recipe_indices"] = user.recommend(n)  # Get recommended indices from the user vector
+## Data and model loading functions
+@st.cache_data
+def load_data(path: str) -> pd.DataFrame:
+    """Load the main data and pre-trained Word2Vec model."""
+    return pd.read_pickle(path)
 
-def liked(recipe_idx, idx):
-    """
-    Handle the like button click event.
-    """
+@st.cache_resource
+def load_model(path: str):
+    """Load the pre-trained Word2Vec model."""
+    return Word2Vec.load(path)
+
+@st.cache_resource
+def connect_database():
+    """Connect to the DynamoDB database."""
+    dynamodb = boto3.resource("dynamodb",
+                            aws_access_key_id=st.secrets.s3.AWS_ACCESS_KEY_ID,
+                            aws_secret_access_key=st.secrets.s3.AWS_SECRET_ACCESS_KEY,
+                            region_name=st.secrets.s3.AWS_DEFAULT_REGION)
+    table = dynamodb.Table(st.secrets.s3.DB_NAME)
+    return table
+
+## Recommendation functions
+def update_recommendation(n_recipes):
+    """Update the recommendation by resetting the display indices."""
+    st.toast("RECOMMENDATION UPDATED")
+    st.session_state["display_recipe_indices"] = user.recommend(n_recipes, st.session_state["recipe_vector_means"])
+    st.session_state["display_excluded_indices"] = set(user.liked_idx).union(user.disliked_idx)
+
+def liked(recipe_idx, display_idx):
+    """Handle the like button click event."""
     st.toast("Liked!")  # Display a toast message when the like button is clicked
-    user.like(recipes_vector_mean[recipe_idx])  # Update user's vector with the liked recipe vector
-    user.exclude_idx.add(recipe_idx)  # Add the recipe index to the exclude list
-    st.session_state["display_recipe_indices"] = np.delete(st.session_state["display_recipe_indices"], idx)  # Remove the liked recipe from the displayed recommendations
+    st.session_state["user"].like(recipe_idx, st.session_state["recipe_vector_means"])  # Update the user vector by liking the recipe
+    st.session_state["display_recipe_indices"] = np.delete(st.session_state["display_recipe_indices"], display_idx)  # Remove the liked recipe from the displayed recommendations
+    save_user_config(table)
 
-def disliked(recipe_idx, idx):
-    """
-    Handle the dislike button click event.
-    """
+def disliked(recipe_idx, display_idx):
+    """Handle the dislike button click event."""
     st.toast("Disliked!")  # Display a toast message when the dislike button is clicked
-    user.dislike(recipes_vector_mean[recipe_idx])
-    user.exclude_idx.add(recipe_idx)  # Add the recipe index to the exclude list
-    st.session_state["display_recipe_indices"] = np.delete(st.session_state["display_recipe_indices"], idx)  # Remove the disliked recipe from the displayed recommendations
+    st.session_state["user"].dislike(recipe_idx, st.session_state["recipe_vector_means"])
+    st.session_state["display_recipe_indices"] = np.delete(st.session_state["display_recipe_indices"], display_idx)  # Remove the disliked recipe from the displayed recommendations
+    save_user_config(table)
 
+@st.cache_data
+def process_recipe_vector_means(data: pd.DataFrame, _model: Word2Vec) -> list:
+    """Takes in a list of recipe ingredients, embeds it and calculate the mean"""
+    recipes_vector_mean = []
 
-#-- Recommendation Functionality
-from sklearn.metrics.pairwise import cosine_similarity
-
-def get_recipe_vector_mean(ingredients: list, model: Word2Vec) -> list:
-    """
-    Takes in a list of recipe ingredients, embeds it and calculate the mean
-    """
-    vector_embedding = [model.wv[ing] for ing in ingredients if ing in model.wv]
-    return np.mean(vector_embedding, axis=0) if vector_embedding else np.zeros(model.vector_size) * -1
+    for recipe_ingredients in data.ingredients:
+        embedding_vec = [model.wv[ing] for ing in recipe_ingredients if ing in model.wv]
+        mean_vec = np.mean(embedding_vec, axis=0) if embedding_vec else np.zeros(model.vector_size) * -1
+        recipes_vector_mean.append(mean_vec)
     
-recipes_vector_mean = [get_recipe_vector_mean(recipe, model) for recipe in data.ingredients]
-recipes_vector_mean = np.array(recipes_vector_mean)
+    return np.array(recipes_vector_mean)
 
-class User:
-    def __init__(self, vector_dim):
-        self.vec = np.zeros(vector_dim)
-        self.dislike_step = 0.3
-        self.like_step = 1
-        self.exclude_idx = set()
+#-- Database Management
+def load_user_config(table, vector_size=100):
+    """Load user configurations from DynamoDB."""  
+    try:
+        # st.toast("USER DYNAMODB LOADED")
+        user_config = table.get_item(Key={"user_id": int(st.user.get("sub"))})["Item"]
+        dummy_user = User(vector_size)  # Initialize the user object with the model vector size
 
-    def like(self, recipe_vector_mean):
-        self.vec += self.like_step * recipe_vector_mean
+        dummy_user.vec = np.array(user_config.get("user_vec"), dtype=np.float64)
+        dummy_user.liked_idx = set(np.array(user_config.get("liked_idx"), dtype=np.int64))
+        dummy_user.disliked_idx = set(np.array(user_config.get("disliked_idx"), dtype=np.int64))
+        return dummy_user
+    except:
+        return User(vector_size) 
 
-    def dislike(self, recipe_vector_mean):
-        self.vec -= self.dislike_step * recipe_vector_mean
+def save_user_config(table):
+    """Save user configurations to DynamoDB only if the user is logged in."""
+    if st.user.is_logged_in:
+        cur_user = st.session_state["user"]
 
-    def recommend(self, n):
-        if not self.vec.any():
-            display_recipe_indices = np.random.choice(len(recipes_vector_mean), n, replace=False)
-            return display_recipe_indices
+        table.put_item(
+            Item={
+                "user_id": int(st.user.get("sub")),
+                "user_vec": [Decimal(f"{val}") for val in cur_user.vec],
+                "liked_idx": [Decimal(f"{idx}") for idx in cur_user.liked_idx],
+                "disliked_idx": [Decimal(f"{idx}") for idx in cur_user.disliked_idx]
+            }
+        )
+        # st.toast("USER CONFIGURATIONS SAVED TO DYNAMODB")
 
-        sims = cosine_similarity(self.vec.reshape(1, -1), recipes_vector_mean)[0]
+def reset_user_config(vector_size=100):
+    """Reset the user configurations in the session state."""
+    cur_user = User(vector_size)  # Create a new user object with the model vector size
+    table.put_item(
+        Item={
+            "user_id": int(st.user.get("sub")),
+            "user_vec": [Decimal(f"{val}") for val in cur_user.vec],
+            "liked_idx": [Decimal(f"{idx}") for idx in cur_user.liked_idx],
+            "disliked_idx": [Decimal(f"{idx}") for idx in cur_user.disliked_idx]
+        }
+    )
 
-        if self.exclude_idx:
-            sims[list(self.exclude_idx)] = -1 # Exclude recipes shown
+#-- Preparing the content
+table = connect_database()  # Connect to the DynamoDB table
+data = load_data("processed_cookbook.pkl") # Load the main data
+model = load_model("word2vec.model") # Load the pre-trained Word2Vec model
+st.session_state["recipe_vector_means"] = process_recipe_vector_means(data, model)  # Process the recipe vector mean
 
-        arg_sorted_sims = sims.argsort()[::-1]  # Sort indices by similarity in descending order
-        arg_pool = np.append(arg_sorted_sims[:(n*2)], arg_sorted_sims[(-n*2):])  # Get a pool of indices to choose from
-        return np.random.choice(arg_pool, n, replace=False)
+# Load user configurations from DynamoDB if logged in
+if st.user.is_logged_in:
+    st.session_state["user"] = load_user_config(table, model.vector_size)
 
-#-- User Session Management
-if "user" not in st.session_state:
-    st.toast("USER RESET")
-    st.session_state["user"] = User(model.vector_size)  # Initialize user with vector dimension
+if st.session_state.get("user") is None:
+    st.toast("USER INITIALIZED")
+    st.session_state["user"] = User(model.vector_size)
 
 user = st.session_state["user"]
 
 #-- Content Configurations
-n_recipe = 20  # Number of recipes to recommend
+n_recipes = 20  # Number of recipes to recommend
 n_cols = 4 # Number of recipes to display in each row
-n_rows = np.ceil(n_recipe/n_cols).astype(int) # Number of rows to display
+n_rows = np.ceil(n_recipes/n_cols).astype(int) # Number of rows to display
 
-if "display_recipe_indices" not in st.session_state:
-    st.toast("RECOMMENDATION RESET")
-    st.session_state["display_recipe_indices"] = user.recommend(n_recipe) 
-
+if "display_recipe_indices" not in st.session_state or "display_excluded_indices" not in st.session_state:
+    update_recommendation(n_recipes)
+     
 display_recipe_indices = st.session_state["display_recipe_indices"]  # Get the recommended indices from the session state
-preloaded_data = data.iloc[display_recipe_indices].reset_index(drop=True)  # Preloaded data for the selected recipes
+excluded_indices = st.session_state["display_excluded_indices"]  # Get the excluded indices from the session state
+
+adjusted_data = data.drop(index=excluded_indices).reset_index()  # Drop the liked and disliked recipes from the data
+preloaded_data = adjusted_data.iloc[display_recipe_indices].reset_index(drop=True)  # Preloaded data for the selected recipes
+
 
 #-- Main Page Content
-if not st.user.is_logged_in:
-    if st.button("Log in"):
-        st.login()
-else:
-    if st.button("Log out"):
-        st.logout()
-    st.write(f"Hello, {st.user.name}!")
-    
 st.title("Food Recipes Recommendation")
 st.write("This is a simple web app for recommending food recipes using Word2Vec model.")
 
-def print_user_vector():
-    """
-    Print the user vector in a readable format.
-    """
-    st.toast(user.vec)
-
-
-st.button("User Vector", key="user_vector", on_click=print_user_vector, help="Click to view your user vector")
-st.button("Recommend Recipes", key="recommend_recipes", on_click=reset_recommendation, args=(n_recipe,))
-
-
+st.button("Recommend Recipes", key="recommend_recipes", on_click=update_recommendation, args=(n_recipes, ), use_container_width=True)
 st.subheader("Recommended Recipes")
 
 ## Create columns for displaying the recommended recipes
@@ -157,8 +179,11 @@ for i, card in enumerate(grid):
         with container:
             # Display the recipe image
             st.image(f"{preloaded_data.image_url.iloc[i]}", use_container_width=True)
-            sims = cosine_similarity(user.vec.reshape(1, -1), recipes_vector_mean)[0]
-            st.markdown(sims[display_recipe_indices[i]])
+            sims = cosine_similarity(user.vec.reshape(1, -1), st.session_state["recipe_vector_means"])[0]
+
+            # Show the similarity score
+            st.badge(f"Similarity: {sims[display_recipe_indices[i]]*100:.0f}%", color="red")
+
             # Recipe title
             st.subheader(f"[{current_recipe.recipe_title}]({current_recipe.recipe_url})")
 
@@ -189,3 +214,74 @@ for i, card in enumerate(grid):
     except:
         # If there are not enough recipes to fill the columns, skip the remaining columns
         continue
+
+## Development Controls
+with st.sidebar:
+    
+    # User Information
+    st.header("User Information")
+    st.write(f"**User ID:** {st.user.get('sub', 'Not logged in')}")
+    
+    if not st.user.is_logged_in:
+        if st.button("Login", use_container_width=True, icon=":material/login:"):
+            st.login()
+        
+    else:
+        if st.button("Logout", use_container_width=True, icon=":material/logout:"):
+            st.logout()
+
+        if st.button(":red[Reset User]", use_container_width=True):
+            reset_user_config(vector_size=model.vector_size)
+            st.toast("USER CONFIGURATIONS RESET")
+            st.rerun()
+
+    st.divider()
+    # Displayed Configurations
+    st.header("Displayed Configurations")
+
+    st.write(f"**Session Recipe Display Indices:**")
+    st.write(f"{display_recipe_indices}")
+
+    st.write("**Current Excluded Indices:**")
+    if not excluded_indices:
+        st.write("No recipes excluded yet.")
+    else:
+        st.write(f"{excluded_indices}")
+    
+
+    st.write(f"**Number of Recipes Displayed:** {len(adjusted_data)}")
+    st.divider()
+
+    # User Configurations
+    st.header("Current User Configurations")
+
+    # Liked/Disliked recipes
+    st.write("**Liked Recipes:**")
+    if user.liked_idx:
+        st.write(f"{list(user.liked_idx)}")
+    else:
+        st.write("No recipes excluded yet.")
+
+    st.write("**Disliked Recipes:**")
+    if user.disliked_idx:
+        st.write(f"{list(user.disliked_idx)}")
+    else:
+        st.write("No recipes disliked yet.")
+
+
+    # # User Cookies
+    # st.write("Current Cookies:")
+    # st.write(cookies)
+
+    # # Clear the cookie
+    # if st.button("Clear Cookies"):
+    #     reset_cookies() 
+
+    # User recipes vector mean
+    st.write("**User Recipes Vector Mean Shape:**")
+    st.write(f"{st.session_state["recipe_vector_means"].shape}")
+
+    # User vector
+    st.write("**User Vector:**")
+    st.write(f"{" ".join(np.round(user.vec, 2).astype("str"))}")
+##
