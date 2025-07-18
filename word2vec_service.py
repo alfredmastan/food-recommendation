@@ -43,8 +43,8 @@ def recommend(user_id, n: int):
     """
     # Get user configuration from DynamoDB
     user_config = table.get_item(Key={"user_id": int(user_id)})["Item"]
-    liked_idx = set(np.array(user_config.get("liked_idx"), dtype=np.int64))
-    disliked_idx = set(np.array(user_config.get("disliked_idx"), dtype=np.int64))
+    liked_idx = set(map(int, user_config.get("liked_idx").keys()))
+    disliked_idx = set(map(int, user_config.get("disliked_idx").keys()))
 
     exclude_indices = set(liked_idx).union(disliked_idx)
 

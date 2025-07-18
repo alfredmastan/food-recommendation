@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import boto3
-from decimal import Decimal
+from datetime import datetime
 import requests
 import json
 
@@ -57,7 +57,7 @@ def connect_database():
 def update_recommendation(n_recipes):
     """Update the recommendation by resetting the display indices."""
     response = requests.get(f"http://localhost:8000/recommend/{st.user.get('sub')}/{n_recipes}")
-
+    
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. User not found. API call failed.")
         st.session_state["display_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False)
@@ -65,20 +65,20 @@ def update_recommendation(n_recipes):
         return
     
     st.session_state["display_recipe_indices"] = np.asarray(json.loads(response.json()))
-    st.session_state["display_excluded_indices"] = set(st.session_state["liked_idx"]).union(st.session_state["disliked_idx"])
+    st.session_state["display_excluded_indices"] = set(st.session_state["liked_idx"].keys()).union(st.session_state["disliked_idx"].keys())
     st.toast("RECOMMENDATION UPDATED")
 
 def liked(recipe_idx, display_idx):
     """Handle the like button click event."""
     st.toast("Liked!")  # Display a toast message when the like button is clicked
-    st.session_state["liked_idx"].add(recipe_idx)  # Update the user vector by liking the recipe
+    st.session_state["liked_idx"][str(recipe_idx)] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Update the user vector by liking the recipe
     st.session_state["display_recipe_indices"] = np.delete(st.session_state["display_recipe_indices"], display_idx)  # Remove the liked recipe from the displayed recommendations
     save_user_config()
 
 def disliked(recipe_idx, display_idx):
     """Handle the dislike button click event."""
     st.toast("Disliked!")  # Display a toast message when the dislike button is clicked
-    st.session_state["disliked_idx"].add(recipe_idx)  # Update the user vector by disliking the recipe
+    st.session_state["disliked_idx"][str(recipe_idx)] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Update the user vector by disliking the recipe
     st.session_state["display_recipe_indices"] = np.delete(st.session_state["display_recipe_indices"], display_idx)  # Remove the disliked recipe from the displayed recommendations
     save_user_config()
 
@@ -89,12 +89,12 @@ def load_user_config():
     """Load user configurations from DynamoDB."""  
     try:
         user_config = table.get_item(Key={"user_id": int(st.user.get("sub"))})["Item"]
-        st.session_state["liked_idx"] = set(np.array(user_config.get("liked_idx"), dtype=np.int64))
-        st.session_state["disliked_idx"] = set(np.array(user_config.get("disliked_idx"), dtype=np.int64))
+        st.session_state["liked_idx"] = user_config.get("liked_idx")
+        st.session_state["disliked_idx"] = user_config.get("disliked_idx")
         st.toast("USER DYNAMODB LOADED")
     except:
-        st.session_state["liked_idx"] = set()
-        st.session_state["disliked_idx"] = set()
+        st.session_state["liked_idx"] = {}
+        st.session_state["disliked_idx"] = {}
         st.toast("USER DYNAMODB NOT FOUND OR NO LIKED/DISLIKED RECIPES")
 
 def save_user_config():
@@ -103,8 +103,8 @@ def save_user_config():
         table.put_item(
             Item={
                 "user_id": int(st.user.get("sub")),
-                "liked_idx": [Decimal(f"{idx}") for idx in st.session_state["liked_idx"]],
-                "disliked_idx": [Decimal(f"{idx}") for idx in st.session_state["disliked_idx"]]
+                "liked_idx": st.session_state["liked_idx"],
+                "disliked_idx": st.session_state["disliked_idx"]
             }
         )
         st.toast("USER CONFIGURATIONS SAVED TO DYNAMODB")
@@ -114,8 +114,8 @@ def reset_user_config():
     table.put_item(
         Item={
             "user_id": int(st.user.get("sub")),
-            "liked_idx": [],
-            "disliked_idx": []
+            "liked_idx": {},
+            "disliked_idx": {}
         }
     )
 
@@ -181,11 +181,11 @@ for i, card in enumerate(grid):
 
             # Ingredients
             st.markdown("**Ingredients:**")
-            str = []
+            ingredient_str = []
             for ingredient in current_recipe.ingredients:
                 clean_str = ingredient.replace("_", " ").title()
-                str.append(f":blue-badge[{clean_str}]")
-            st.markdown(" ".join(str))
+                ingredient_str.append(f":blue-badge[{clean_str}]")
+            st.markdown(" ".join(ingredient_str))
 
             # Like/Dislike
             button_cols = st.columns(2, gap="small")  # Create two columns for like/dislike buttons
@@ -240,13 +240,13 @@ with st.sidebar:
     # Liked/Disliked recipes
     st.write("**Liked Recipes:**")
     if st.session_state.liked_idx:
-        st.write(f"{list(st.session_state["liked_idx"])}")
+        st.write(f"{list(st.session_state["liked_idx"].keys())}")
     else:
         st.write("No recipes excluded yet.")
 
     st.write("**Disliked Recipes:**")
     if st.session_state.disliked_idx:
-        st.write(f"{list(st.session_state["disliked_idx"])}")
+        st.write(f"{list(st.session_state["disliked_idx"].keys())}")
     else:
         st.write("No recipes disliked yet.")
 
