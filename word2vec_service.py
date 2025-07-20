@@ -46,7 +46,7 @@ def recommend(user_id, n: int):
     liked_idx = set(map(int, user_config.get("liked_idx").keys()))
     disliked_idx = set(map(int, user_config.get("disliked_idx").keys()))
 
-    exclude_indices = set(liked_idx).union(disliked_idx)
+    exclude_indices = liked_idx.union(disliked_idx)
 
     # If there are no liked or disliked recipes, return random indices
     if not exclude_indices:

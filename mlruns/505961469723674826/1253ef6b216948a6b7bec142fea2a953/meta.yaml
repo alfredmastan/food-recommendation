@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/1253ef6b216948a6b7bec142fea2a953/artifacts
+end_time: 1752979883220
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: active
+run_id: 1253ef6b216948a6b7bec142fea2a953
+run_name: bright-goose-311
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752979882993
+status: 3
+tags: []
+user_id: alfredmastan
