@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/845402499476734490/12b6afb7b145458f91f335dcf6ba4842/artifacts
+deleted_time: 1754959504599
+end_time: 1754958976594
+entry_point_name: ''
+experiment_id: '845402499476734490'
+lifecycle_stage: deleted
+run_id: 12b6afb7b145458f91f335dcf6ba4842
+run_name: classy-shark-536
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754958976451
+status: 3
+tags: []
+user_id: alfredmastan

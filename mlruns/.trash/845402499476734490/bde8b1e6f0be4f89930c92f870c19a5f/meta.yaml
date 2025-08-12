@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/845402499476734490/bde8b1e6f0be4f89930c92f870c19a5f/artifacts
+deleted_time: 1754959504599
+end_time: 1754958781370
+entry_point_name: ''
+experiment_id: '845402499476734490'
+lifecycle_stage: deleted
+run_id: bde8b1e6f0be4f89930c92f870c19a5f
+run_name: nervous-duck-591
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754958780899
+status: 3
+tags: []
+user_id: alfredmastan

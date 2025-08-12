@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/845402499476734490/1f94025c4edd4828bef48ae532192f7f/artifacts
+deleted_time: 1754959504599
+end_time: 1754958746643
+entry_point_name: ''
+experiment_id: '845402499476734490'
+lifecycle_stage: deleted
+run_id: 1f94025c4edd4828bef48ae532192f7f
+run_name: hilarious-shrike-395
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754958746507
+status: 3
+tags: []
+user_id: alfredmastan

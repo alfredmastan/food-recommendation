@@ -5,21 +5,17 @@ from sklearn.metrics.pairwise import cosine_similarity
 import mlflow
 import json
 
-# Define the model path and recipe path
-model_path = "word2vec.model"
-recipe_path = "processed_cookbook.pkl"
-
 class Word2VecModel(mlflow.pyfunc.PythonModel):
     def __init__(self, n_recs=10):
         self.n_recs = n_recs
         self.model = None
 
     def load_context(self, context):
-        self.model = Word2Vec.load(model_path)
+        self.model = Word2Vec.load(context.artifacts["model_path"])
 
         # Calculate recipe vector means
         recipe_vector_means = []
-        self.data = pd.read_pickle(recipe_path)
+        self.data = pd.read_pickle(context.artifacts["recipe_path"])
         for recipe_ingredients in self.data.ingredients:
             embedding_vec = [self.model.wv[ing] for ing in recipe_ingredients if ing in self.model.wv]
             mean_vec = np.mean(embedding_vec, axis=0) if embedding_vec else np.zeros(self.model.vector_size) * -1
@@ -50,7 +46,7 @@ class Word2VecModel(mlflow.pyfunc.PythonModel):
             return json.dumps(rand.tolist())
 
         # Calculate user vector based on liked and disliked recipes
-        user_vec = np.zeros(self.recipe_vector_means.shape[1]) + np.sum(self.recipe_vector_means[list(liked_idx)], axis=0) - np.sum(self.recipe_vector_means[list(disliked_idx)], axis=0)
+        user_vec = np.zeros(self.recipe_vector_means.shape[1]) + (0.8 * np.sum(self.recipe_vector_means[list(liked_idx)], axis=0)) - (0.3 * np.sum(self.recipe_vector_means[list(disliked_idx)], axis=0))
 
         # Calculate cosine similarity between user vector and recipe vectors
         sims = cosine_similarity(user_vec.reshape(1, -1), self.recipe_vector_means)[0]
@@ -66,9 +62,11 @@ class Word2VecModel(mlflow.pyfunc.PythonModel):
             recipe_similarity = recipe_similarity[~recipe_similarity.id.isin(exclude_indices)]
 
         recipe_similarity = recipe_similarity.sort_values(by="similarity", ascending=False) # Sort by similarity in descending order
-        sorted_ids = recipe_similarity.id[::-1]  # Sort indices by similarity in descending order
+        sorted_ids = recipe_similarity.id[:self.n_recs] # Grab top N indices by similarity
 
         rand = np.random.choice(sorted_ids[:self.n_recs], self.n_recs, replace=False)
         return json.dumps(rand.tolist())
 
-mlflow.models.set_model(Word2VecModel(10))
+# Config
+n_recs = 10
+mlflow.models.set_model(Word2VecModel(n_recs))

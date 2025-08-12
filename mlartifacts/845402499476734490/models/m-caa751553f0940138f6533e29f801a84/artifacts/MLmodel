@@ -1,0 +1,32 @@
+artifact_path: mlflow-artifacts:/845402499476734490/models/m-caa751553f0940138f6533e29f801a84/artifacts
+flavors:
+  python_function:
+    artifacts:
+      model_path:
+        path: artifacts/word2vec.model
+        uri: word2vec.model
+      recipe_path:
+        path: artifacts/processed_cookbook.pkl
+        uri: processed_cookbook.pkl
+    cloudpickle_version: 3.1.1
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.loaders.code_model
+    model_code_path: /Users/alfredmastan/Documents/Projects/Food Recipes Recommendation/models/word2vec.py
+    python_version: 3.12.3
+    streamable: false
+is_signature_from_type_hint: true
+mlflow_version: 3.1.1
+model_id: m-caa751553f0940138f6533e29f801a84
+model_size_bytes: 4375439
+model_uuid: m-caa751553f0940138f6533e29f801a84
+prompts: null
+run_id: 530dff6c39884c37855c784241d1f36f
+signature:
+  inputs: '[{"type": "array", "items": {"type": "long"}, "required": true}]'
+  outputs: '[{"type": "string", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-08-12 00:26:17.154918'

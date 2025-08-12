@@ -1,0 +1,7 @@
+artifact_location: mlflow-artifacts:/845402499476734490
+creation_time: 1754958376255
+experiment_id: '845402499476734490'
+last_update_time: 1754959504599
+lifecycle_stage: deleted
+name: word2vec_service
+tags: {}

@@ -56,8 +56,14 @@ def connect_database():
 ## Recommendation functions
 def update_recommendation(n_recipes):
     """Update the recommendation by resetting the display indices."""
-    response = requests.get(f"http://localhost:8000/recommend/{st.user.get('sub')}/{n_recipes}")
-    
+    # Fetch liked_idx and disliked_idx for current user
+    user_item = table.get_item(Key={"user_id": int(st.user.get("sub"))})["Item"]
+    liked_idx = list(map(int, user_item["liked_idx"].keys()))
+    disliked_idx = list(map(int, user_item["disliked_idx"].keys()))
+
+    # Call the recommendation API
+    response = requests.get(f"http://localhost:8000/recommend/", json={"liked_idx": liked_idx, "disliked_idx": disliked_idx})
+
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. User not found. API call failed.")
         st.session_state["display_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False)

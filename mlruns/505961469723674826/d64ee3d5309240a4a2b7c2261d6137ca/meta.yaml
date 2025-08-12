@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/d64ee3d5309240a4a2b7c2261d6137ca/artifacts
+end_time: 1754956450621
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: active
+run_id: d64ee3d5309240a4a2b7c2261d6137ca
+run_name: masked-goose-28
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754956449784
+status: 3
+tags: []
+user_id: alfredmastan
