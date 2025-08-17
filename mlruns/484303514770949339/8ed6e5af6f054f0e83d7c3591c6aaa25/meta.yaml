@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/8ed6e5af6f054f0e83d7c3591c6aaa25/artifacts
+end_time: 1755380508238
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 8ed6e5af6f054f0e83d7c3591c6aaa25
+run_name: sneaky-pig-906
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755380508131
+status: 3
+tags: []
+user_id: alfredmastan

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/fbc7b0c5ef074521a0b9e697f9e78937/artifacts
+deleted_time: 1755374313560
+end_time: 1754971002210
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: fbc7b0c5ef074521a0b9e697f9e78937
+run_name: delicate-bird-306
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754971002052
+status: 4
+tags: []
+user_id: alfredmastan

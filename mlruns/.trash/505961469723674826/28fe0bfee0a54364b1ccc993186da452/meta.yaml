@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/28fe0bfee0a54364b1ccc993186da452/artifacts
+deleted_time: 1755374313560
+end_time: 1754973171692
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: 28fe0bfee0a54364b1ccc993186da452
+run_name: funny-grouse-221
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754973170710
+status: 3
+tags: []
+user_id: alfredmastan

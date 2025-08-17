@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/58d890cbe93d444f88aea3119c10866e/artifacts
+end_time: 1755471938506
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 58d890cbe93d444f88aea3119c10866e
+run_name: brawny-dog-535
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755471938373
+status: 3
+tags: []
+user_id: alfredmastan

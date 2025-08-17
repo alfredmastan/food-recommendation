@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/215b3fd9922d4ed3a1c661bbe9fb2cfa/artifacts
+end_time: 1755391416250
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 215b3fd9922d4ed3a1c661bbe9fb2cfa
+run_name: resilient-hawk-6
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755391415262
+status: 3
+tags: []
+user_id: alfredmastan

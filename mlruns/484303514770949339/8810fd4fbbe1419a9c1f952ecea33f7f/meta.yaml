@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/8810fd4fbbe1419a9c1f952ecea33f7f/artifacts
+end_time: 1755471003344
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 8810fd4fbbe1419a9c1f952ecea33f7f
+run_name: polite-trout-500
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755470999997
+status: 3
+tags: []
+user_id: alfredmastan

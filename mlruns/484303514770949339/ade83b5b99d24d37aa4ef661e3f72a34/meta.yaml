@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/ade83b5b99d24d37aa4ef661e3f72a34/artifacts
+end_time: 1755379566273
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: ade83b5b99d24d37aa4ef661e3f72a34
+run_name: skillful-bird-337
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755379565450
+status: 3
+tags: []
+user_id: alfredmastan

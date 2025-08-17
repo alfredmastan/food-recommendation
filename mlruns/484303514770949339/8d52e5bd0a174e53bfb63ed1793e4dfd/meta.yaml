@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/8d52e5bd0a174e53bfb63ed1793e4dfd/artifacts
+end_time: 1755380497987
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 8d52e5bd0a174e53bfb63ed1793e4dfd
+run_name: treasured-mink-707
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755380497158
+status: 3
+tags: []
+user_id: alfredmastan

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/b7d33d17554c45afb0b6ca420668222d/artifacts
+deleted_time: 1755374313560
+end_time: 1754973660040
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: b7d33d17554c45afb0b6ca420668222d
+run_name: invincible-mare-88
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754973659249
+status: 3
+tags: []
+user_id: alfredmastan

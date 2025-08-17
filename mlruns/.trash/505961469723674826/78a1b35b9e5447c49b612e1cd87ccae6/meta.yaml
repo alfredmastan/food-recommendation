@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/78a1b35b9e5447c49b612e1cd87ccae6/artifacts
+deleted_time: 1755374313560
+end_time: 1754973666543
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: 78a1b35b9e5447c49b612e1cd87ccae6
+run_name: unleashed-mouse-234
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754973665897
+status: 3
+tags: []
+user_id: alfredmastan

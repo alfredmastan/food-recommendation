@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/8b237f23141c48e18ee4bccbfe5baeee/artifacts
+deleted_time: 1755374313560
+end_time: 1754973661378
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: 8b237f23141c48e18ee4bccbfe5baeee
+run_name: merciful-shrimp-331
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754973660725
+status: 3
+tags: []
+user_id: alfredmastan

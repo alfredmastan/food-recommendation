@@ -1,0 +1,10 @@
+artifact_location: mlflow-artifacts:/484303514770949339/models/m-267edebc03884fd99df8e5ad7c66cfd0/artifacts
+creation_timestamp: 1755471928109
+experiment_id: '484303514770949339'
+last_updated_timestamp: 1755471929710
+model_id: m-267edebc03884fd99df8e5ad7c66cfd0
+model_type: ''
+name: word2vec_model_search
+source_run_id: 33fa5ffa848042aa8d54b4e2b14aaf55
+status: 2
+status_message: null

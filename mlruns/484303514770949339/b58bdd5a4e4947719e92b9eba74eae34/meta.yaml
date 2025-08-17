@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/b58bdd5a4e4947719e92b9eba74eae34/artifacts
+end_time: 1755379840067
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: b58bdd5a4e4947719e92b9eba74eae34
+run_name: spiffy-snipe-778
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755379839481
+status: 3
+tags: []
+user_id: alfredmastan

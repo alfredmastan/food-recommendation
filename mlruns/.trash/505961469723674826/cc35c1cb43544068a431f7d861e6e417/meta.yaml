@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/cc35c1cb43544068a431f7d861e6e417/artifacts
+deleted_time: 1755374313560
+end_time: 1754973660712
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: cc35c1cb43544068a431f7d861e6e417
+run_name: stately-panda-420
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754973660049
+status: 3
+tags: []
+user_id: alfredmastan

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/61bfa5b01e114694aed315b837c497cc/artifacts
+deleted_time: 1755374313560
+end_time: 1754973150233
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: 61bfa5b01e114694aed315b837c497cc
+run_name: masked-fly-249
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754973149724
+status: 4
+tags: []
+user_id: alfredmastan

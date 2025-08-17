@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/1f12afec8a3743ecacde7e8ad2333063/artifacts
+end_time: 1755379953696
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 1f12afec8a3743ecacde7e8ad2333063
+run_name: calm-fawn-980
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755379953125
+status: 3
+tags: []
+user_id: alfredmastan

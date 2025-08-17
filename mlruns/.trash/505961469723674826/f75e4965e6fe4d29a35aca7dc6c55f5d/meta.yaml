@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/f75e4965e6fe4d29a35aca7dc6c55f5d/artifacts
+deleted_time: 1755374313560
+end_time: 1754970943662
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: f75e4965e6fe4d29a35aca7dc6c55f5d
+run_name: funny-toad-808
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754970943465
+status: 4
+tags: []
+user_id: alfredmastan

@@ -11,6 +11,7 @@ import boto3
 from datetime import datetime
 import requests
 import json
+import time
 
 #########################################################################################################################
 #-- Page Configuration
@@ -56,23 +57,36 @@ def connect_database():
 ## Recommendation functions
 def update_recommendation(n_recipes):
     """Update the recommendation by resetting the display indices."""
+
+    # if not st.user.is_logged_in:
+    #     st.toast("User not logged in.")
+    #     st.session_state["display_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False)
+    #     st.session_state["display_excluded_indices"] = []
+    #     return
+    
     # Fetch liked_idx and disliked_idx for current user
-    user_item = table.get_item(Key={"user_id": int(st.user.get("sub"))})["Item"]
-    liked_idx = list(map(int, user_item["liked_idx"].keys()))
-    disliked_idx = list(map(int, user_item["disliked_idx"].keys()))
+    # user_item = table.get_item(Key={"user_id": int(st.user.get("sub"))})["Item"]
+    # liked_idx = list(map(int, user_item["liked_idx"].keys()))
+    # disliked_idx = list(map(int, user_item["disliked_idx"].keys()))
 
     # Call the recommendation API
-    response = requests.get(f"http://localhost:8000/recommend/", json={"liked_idx": liked_idx, "disliked_idx": disliked_idx})
-
-    if response.status_code != 200:
-        st.toast("Failed to fetch recommendations. User not found. API call failed.")
+    # response = requests.get(f"http://localhost:8000/recommend/", json={"liked_idx": liked_idx, "disliked_idx": disliked_idx})
+    if not st.session_state.get("ingredient_input", ""):
         st.session_state["display_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False)
         st.session_state["display_excluded_indices"] = []
         return
     
-    st.session_state["display_recipe_indices"] = np.asarray(json.loads(response.json()))
-    st.session_state["display_excluded_indices"] = set(st.session_state["liked_idx"].keys()).union(st.session_state["disliked_idx"].keys())
-    st.toast("RECOMMENDATION UPDATED")
+    response = requests.get(f"http://localhost:8000/recommend/", params={"query": st.session_state["ingredient_input"]})
+    
+    if response.status_code != 200:
+        st.toast("Failed to fetch recommendations. API call failed.")
+
+    if json.loads(response.json()):
+        st.session_state["display_recipe_indices"] = np.asarray(json.loads(response.json()))
+        st.session_state["display_excluded_indices"] = set(st.session_state["liked_idx"].keys()).union(st.session_state["disliked_idx"].keys())
+        st.toast("RECOMMENDATION UPDATED")
+    else:
+        st.toast("Failed to fetch recommendations.")
 
 def liked(recipe_idx, display_idx):
     """Handle the like button click event."""
@@ -139,18 +153,32 @@ n_rows = np.ceil(n_recipes/n_cols).astype(int) # Number of rows to display
 
 if "display_recipe_indices" not in st.session_state or "display_excluded_indices" not in st.session_state:
     update_recommendation(n_recipes)
-     
-display_recipe_indices = st.session_state["display_recipe_indices"]  # Get the recommended indices from the session state
-excluded_indices = st.session_state["display_excluded_indices"]  # Get the excluded indices from the session state
 
-preloaded_data = data[~data.id.isin(list(excluded_indices))] # Preloaded data for the selected recipes
+# display_recipe_indices = st.session_state["display_recipe_indices"]  # Get the recommended indices from the session state
+# excluded_indices = st.session_state["display_excluded_indices"]  # Get the excluded indices from the session state
+
+preloaded_data = data[~data.id.isin(list(st.session_state["display_excluded_indices"]))] # Preloaded data for the selected recipes
 
 #########################################################################################################################
 #-- Main Page Content
 st.title("Food Recipes Recommendation")
 st.write("This is a simple web app for recommending food recipes using Word2Vec model.")
+st.feedback(options="stars")
+
 
 st.button("Recommend Recipes", key="recommend_recipes", on_click=update_recommendation, args=(n_recipes, ), use_container_width=True)
+
+ingredient_input = st.text_input("Enter your ingredients here...", key="chat_input")
+
+if ingredient_input:
+    ingredients = [ingredient.strip() for ingredient in ingredient_input.split(",")]
+    st.session_state["ingredient_input"] = ingredients
+    update_recommendation(n_recipes)
+    ingredients = [f":blue-badge[{ingredient.strip()}]" for ingredient in ingredients]
+    ings_str = " ".join(ingredients)
+    st.markdown("**Ingredients:**")
+    st.markdown(ings_str)
+    
 st.subheader("Recommended Recipes")
 
 ## Create columns for displaying the recommended recipes
@@ -159,13 +187,13 @@ grid = st.columns(n_cols) * n_rows
 for i, card in enumerate(grid):
     try:
         # Get the index of the recipe to display
-        current_recipe = preloaded_data.iloc[display_recipe_indices[i]]
+        current_recipe = preloaded_data.iloc[st.session_state["display_recipe_indices"][i]]
 
         # Create a container for the recipe card
         container = card.container(border=True)
         with container:
             # Display the recipe image
-            st.image(f"{preloaded_data.image_url.iloc[display_recipe_indices[i]]}", use_container_width=True)
+            st.image(f"{preloaded_data.image_url.iloc[st.session_state["display_recipe_indices"][i]]}", use_container_width=True)
             # sims = cosine_similarity(user.vec.reshape(1, -1), st.session_state["recipe_vector_means"])[0]
 
             # Show the similarity score
@@ -195,8 +223,8 @@ for i, card in enumerate(grid):
 
             # Like/Dislike
             button_cols = st.columns(2, gap="small")  # Create two columns for like/dislike buttons
-            button_cols[0].button("", key=f"like_{i}",icon=":material/thumb_up:", use_container_width=True, on_click=liked, args=(display_recipe_indices[i], i))
-            button_cols[1].button("", key=f"dislike_{i}", icon=":material/thumb_down:", use_container_width=True, on_click=disliked, args=(display_recipe_indices[i], i))
+            button_cols[0].button("", key=f"like_{i}",icon=":material/thumb_up:", use_container_width=True, on_click=liked, args=(st.session_state["display_recipe_indices"][i], i))
+            button_cols[1].button("", key=f"dislike_{i}", icon=":material/thumb_down:", use_container_width=True, on_click=disliked, args=(st.session_state["display_recipe_indices"][i], i))
 
     except:
         # If there are not enough recipes to fill the columns, skip the remaining columns
@@ -228,16 +256,16 @@ with st.sidebar:
     st.header("Displayed Configurations")
 
     st.write(f"**Session Recipe Display Indices:**")
-    st.write(f"{display_recipe_indices}")
+    st.write(f"{st.session_state["display_recipe_indices"]}")
 
     st.write("**Current Excluded Indices:**")
-    if not excluded_indices:
+    if not st.session_state["display_excluded_indices"]:
         st.write("No recipes excluded yet.")
     else:
-        st.write(f"{excluded_indices}")
+        st.write(f"{st.session_state["display_excluded_indices"]}")
     
 
-    st.write(f"**Number of Recipes Displayed:** {len(data)-len(excluded_indices)}")
+    st.write(f"**Number of Recipes Displayed:** {len(data)-len(st.session_state["display_excluded_indices"])}")
     st.divider()
 
     # User Configurations

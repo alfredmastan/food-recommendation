@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/25e5794547f34fe1b462eeb4e5ed59ba/artifacts
+deleted_time: 1755374313560
+end_time: 1754969294661
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: 25e5794547f34fe1b462eeb4e5ed59ba
+run_name: monumental-hog-930
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754969294374
+status: 3
+tags: []
+user_id: alfredmastan

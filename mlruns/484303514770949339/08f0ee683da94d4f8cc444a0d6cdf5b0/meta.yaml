@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/08f0ee683da94d4f8cc444a0d6cdf5b0/artifacts
+end_time: 1755472047850
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 08f0ee683da94d4f8cc444a0d6cdf5b0
+run_name: angry-chimp-486
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755472044674
+status: 3
+tags: []
+user_id: alfredmastan

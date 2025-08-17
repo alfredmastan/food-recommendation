@@ -1,0 +1,32 @@
+artifact_path: mlflow-artifacts:/484303514770949339/models/m-da5a184892274a13a745caac753206ad/artifacts
+flavors:
+  python_function:
+    artifacts:
+      model_path:
+        path: artifacts/word2vec.model
+        uri: word2vec.model
+      recipe_path:
+        path: artifacts/processed_cookbook.pkl
+        uri: processed_cookbook.pkl
+    cloudpickle_version: 3.1.1
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.12.3
+    streamable: false
+is_signature_from_type_hint: true
+mlflow_version: 3.1.1
+model_id: m-da5a184892274a13a745caac753206ad
+model_size_bytes: 13766076
+model_uuid: m-da5a184892274a13a745caac753206ad
+prompts: null
+run_id: 1f12afec8a3743ecacde7e8ad2333063
+signature:
+  inputs: '[{"type": "array", "items": {"type": "long"}, "required": true}]'
+  outputs: '[{"type": "string", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-08-16 21:32:33.159783'

@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/4f995c946a604476b3983d22532b62b9/artifacts
+deleted_time: 1755374313560
+end_time: 1754973667145
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: 4f995c946a604476b3983d22532b62b9
+run_name: fortunate-crow-52
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754973666558
+status: 3
+tags: []
+user_id: alfredmastan

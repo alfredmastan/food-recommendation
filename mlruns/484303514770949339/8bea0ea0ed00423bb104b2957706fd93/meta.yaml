@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/8bea0ea0ed00423bb104b2957706fd93/artifacts
+end_time: 1755471047847
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 8bea0ea0ed00423bb104b2957706fd93
+run_name: selective-carp-822
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755471047739
+status: 3
+tags: []
+user_id: alfredmastan

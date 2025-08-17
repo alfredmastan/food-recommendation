@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/484303514770949339/3a7a3efcba714456a345456193da42a0/artifacts
+end_time: 1755470951977
+entry_point_name: ''
+experiment_id: '484303514770949339'
+lifecycle_stage: active
+run_id: 3a7a3efcba714456a345456193da42a0
+run_name: upbeat-duck-348
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755470951946
+status: 4
+tags: []
+user_id: alfredmastan

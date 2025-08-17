@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/505961469723674826/100f7fd82dab4ff09287e55152c651ad/artifacts
+deleted_time: 1755374313560
+end_time: 1754971860169
+entry_point_name: ''
+experiment_id: '505961469723674826'
+lifecycle_stage: deleted
+run_id: 100f7fd82dab4ff09287e55152c651ad
+run_name: learned-mink-307
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1754971859725
+status: 4
+tags: []
+user_id: alfredmastan
