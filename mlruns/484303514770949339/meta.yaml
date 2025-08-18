@@ -1,6 +1,0 @@
-artifact_location: mlflow-artifacts:/484303514770949339
-creation_time: 1755374659072
-experiment_id: '484303514770949339'
-last_update_time: 1755374659072
-lifecycle_stage: active
-name: word2vec_validation
