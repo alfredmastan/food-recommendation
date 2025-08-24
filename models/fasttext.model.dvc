@@ -1,0 +1,5 @@
+outs:
+- md5: b726a8edd0b08dde6cb91eb62b1ed46d
+  size: 1016979
+  hash: md5
+  path: fasttext.model

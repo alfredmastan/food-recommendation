@@ -1,0 +1,5 @@
+outs:
+- md5: 3a423094867edaed362317da3f80773b
+  size: 800000128
+  hash: md5
+  path: fasttext.model.wv.vectors_ngrams.npy
