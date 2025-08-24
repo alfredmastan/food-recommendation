@@ -1,0 +1,13 @@
+# Others
+.DS_Store
+__pycache__
+
+# Docker
+Dockerfile
+README.Docker.md
+compose.yaml
+
+# Streamlit
+.streamlit
+
+# Models
