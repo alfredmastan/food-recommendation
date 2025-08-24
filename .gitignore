@@ -1,6 +1,3 @@
 *.DS_Store
 .streamlit/
 __pycache__/
-*.model
-*.npy
-mlflow/
