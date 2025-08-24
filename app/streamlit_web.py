@@ -76,9 +76,9 @@ def update_recommendation(n_recipes):
         st.session_state["display_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False)
         st.session_state["display_excluded_indices"] = []
         return
-    
-    response = requests.get(f"http://localhost:8000/recommend/", params={"query": st.session_state["ingredient_input"]})
-    
+
+    response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state["ingredient_input"]})
+
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. API call failed.")
 
@@ -102,7 +102,6 @@ def disliked(recipe_idx, display_idx):
     st.session_state["disliked_idx"][str(recipe_idx)] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Update the user vector by disliking the recipe
     st.session_state["display_recipe_indices"] = np.delete(st.session_state["display_recipe_indices"], display_idx)  # Remove the disliked recipe from the displayed recommendations
     save_user_config()
-
 
 #########################################################################################################################
 #-- Database Management
@@ -170,15 +169,14 @@ preloaded_data = data[~data.id.isin(list(st.session_state["display_excluded_indi
 #-- Main Page Content
 st.title("Food Recipes Recommendation")
 st.write("This is a simple web app for recommending food recipes using Word2Vec model.")
-st.feedback(options="stars")
-
+st.feedback(options="thumbs")
 
 st.button("Recommend Recipes", key="recommend_recipes", on_click=update_recommendation, args=(n_recipes, ), use_container_width=True)
 
 ingredient_input = st.text_input("Enter your ingredients here...", key="chat_input")
 
 if ingredient_input:
-    ingredients = [ingredient.strip() for ingredient in ingredient_input.split(",")]
+    ingredients = [ingredient.strip() for ingredient in ingredient_input.split(",") if ingredient]
     st.session_state["ingredient_input"] = ingredients
     update_recommendation(n_recipes)
     ingredients = [f":blue-badge[{ingredient.strip()}]" for ingredient in ingredients]

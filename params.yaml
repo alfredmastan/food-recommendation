@@ -2,14 +2,16 @@ model_pipeline:
   model_path: ../models/fasttext.model
   model_ngram_path: ../models/fasttext.model.wv.vectors_ngrams.npy
   recipe_path: ../data/processed_cookbook.pkl
+
   fast_text:
     vector_size: 100
     window: 5
     sg: 0
     epochs: 100
 
-  model_scoring:
-    w_cosine: 0.2
-    w_maxsim: 0.8
-    n_recs: 30
+model_service:
+  w_title: 0.1
+  w_cosine: 0.2
+  w_maxsim: 0.7
+  n_recs: 30
   
