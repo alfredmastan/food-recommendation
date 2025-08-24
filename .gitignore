@@ -1,3 +1,5 @@
 *.DS_Store
 .streamlit/
 __pycache__/
+mlflow/
+dvcstore/
