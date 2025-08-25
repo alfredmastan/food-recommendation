@@ -1,6 +1,22 @@
 {
-    "server_uri": "models:/m-a2a369cca9394b2aa560e208c4d16b53",
-    "local_uri": "../mlflow/mlartifacts/620532297088492268/models/m-a2a369cca9394b2aa560e208c4d16b53/artifacts",
-    "run_id": "2fb551401bd14318b9fe52760c1f516a",
-    "time_logged": "2025-08-24 22:34:12.488535"
+    "server_uri": "models:/m-1979fc09a68c437abba3eaea4dc5b2e0",
+    "local_uri": "../mlflow/mlartifacts/198067954999234058/models/m-1979fc09a68c437abba3eaea4dc5b2e0/artifacts",
+    "run_id": "d60a2109d99e4d3cab79ffbb21a66c1a",
+    "time_logged": "2025-08-25 04:37:41.531895",
+    "model_params": {
+        "model_path": "../models/fasttext.model",
+        "model_ngram_path": "../models/fasttext.model.wv.vectors_ngrams.npy",
+        "recipe_path": "../data/processed_cookbook.pkl",
+        "fast_text": {
+            "vector_size": 100,
+            "window": 5,
+            "sg": 0,
+            "epochs": 100
+        },
+        "model_scoring": {
+            "w_title": 0.1,
+            "w_cosine": 0.2,
+            "w_maxsim": 0.7
+        }
+    }
 }

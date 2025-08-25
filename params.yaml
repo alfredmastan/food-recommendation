@@ -13,5 +13,7 @@ model_pipeline:
     w_title: 0.1
     w_cosine: 0.2
     w_maxsim: 0.7
-    n_recs: 30
+
+model_service:
+  n_recs: 30
   
