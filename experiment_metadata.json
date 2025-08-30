@@ -1,8 +1,8 @@
 {
-    "server_uri": "models:/m-b8ff9ed47bf84784ae4348a4bf8d867b",
-    "local_uri": "../mlflow/mlartifacts/198067954999234058/models/m-b8ff9ed47bf84784ae4348a4bf8d867b/artifacts",
-    "run_id": "d41dd113c6114f21a3ae2e9da0ea1b03",
-    "time_logged": "2025-08-28 05:17:44.940222",
+    "server_uri": "models:/m-b054fa6fa51b4db283efe9403ec34244",
+    "local_uri": "../mlflow/mlartifacts/894016015501856382/models/m-b054fa6fa51b4db283efe9403ec34244/artifacts",
+    "run_id": "f0948585219b474085473394a186e5c8",
+    "time_logged": "2025-08-30 01:44:31.333364",
     "model_params": {
         "model_path": "../models/fasttext.model",
         "model_ngram_path": "../models/fasttext.model.wv.vectors_ngrams.npy",
