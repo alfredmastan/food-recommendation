@@ -77,13 +77,17 @@ def update_recommendation(n_recipes):
         st.session_state["display_excluded_indices"] = []
         return
 
+    
     response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state["ingredient_input"]})
+    similarity_scores = np.asarray(json.loads(response.json()))
+    recommended_indices = np.argsort(similarity_scores)[::-1][:n_recipes]
+    st.toast(recommended_indices)
 
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. API call failed.")
 
     if json.loads(response.json()):
-        st.session_state["display_recipe_indices"] = np.asarray(json.loads(response.json()))
+        st.session_state["display_recipe_indices"] = recommended_indices
         st.session_state["display_excluded_indices"] = set(st.session_state["liked_idx"].keys()).union(st.session_state["disliked_idx"].keys())
         st.toast("RECOMMENDATION UPDATED")
     else:
@@ -153,7 +157,7 @@ load_user_config() # Load user configurations from DynamoDB if logged in
 
 #########################################################################################################################
 #-- Content Configurations
-n_recipes = 20  # Number of recipes to recommend
+n_recipes = params["model_service"]["n_recs"]  # Number of recipes to recommend
 n_cols = 4 # Number of recipes to display in each row
 n_rows = np.ceil(n_recipes/n_cols).astype(int) # Number of rows to display
 

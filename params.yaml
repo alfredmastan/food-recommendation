@@ -16,4 +16,6 @@ model_pipeline:
 
 model_service:
   n_recs: 30
-  
+
+model_register:
+  max_runs: 3

@@ -25,7 +25,7 @@ import json
 
 # Preparation for Service ============================================================
 # Load model metadata
-with open("../experiment_metadata.json", "r") as f:
+with open("../registered_metadata.json", "r") as f:
     metadata = json.load(f)
 
 # Load params
@@ -48,7 +48,7 @@ async def recommend_search(query: list[str] = Query(default=[],
     Search for recipes based on a query string.
     """
 
-    rec_idx = model.predict(query)[:params["model_service"]["n_recs"]]
+    rec_idx = model.predict(query)
     return json.dumps(rec_idx.tolist())
 
 if __name__ == "__main__":
