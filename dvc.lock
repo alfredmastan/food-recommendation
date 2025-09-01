@@ -1,0 +1,37 @@
+schema: '2.0'
+stages:
+  model_training:
+    cmd: python src/model_training.py
+    deps:
+    - path: data/processed_cookbook.pkl
+      hash: md5
+      md5: dd076aad41804d5b26fd0c080f4fa6d7
+      size: 3355448
+    - path: src/model_training.py
+      hash: md5
+      md5: b62d05b646ac3a1208f00da2e7e4ab5a
+      size: 5375
+    params:
+      params.yaml:
+        model_pipeline.fast_text:
+          vector_size: 100
+          window: 5
+          sg: 0
+          epochs: 100
+        model_pipeline.model_scoring:
+          w_title: 0.1
+          w_cosine: 0.2
+          w_maxsim: 0.7
+    outs:
+    - path: models/fasttext.model
+      hash: md5
+      md5: 157815be24d3cf2c5a7544d1e437fdec
+      size: 1016975
+    - path: models/fasttext.model.wv.vectors_ngrams.npy
+      hash: md5
+      md5: 46cd2f35a27985dc77791be295e88942
+      size: 800000128
+    - path: training_metadata.json
+      hash: md5
+      md5: 05d4f86d7edc314f8b4e1cbda22a7fb8
+      size: 740
