@@ -5,7 +5,7 @@ model_pipeline:
 
   fast_text:
     vector_size: 100
-    window: 5
+    window: 8
     sg: 0
     epochs: 100
 

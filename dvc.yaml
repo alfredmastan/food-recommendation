@@ -2,6 +2,14 @@ params:
   - params.yaml
 
 stages:
+  data_preprocessing:
+    cmd: python src/data_preprocessing.py
+    deps:
+      - src/data_preprocessing.py
+      - data/complete_cookbook.pkl
+    outs:
+      - data/processed_cookbook.pkl
+
   model_training:
     cmd: python src/model_training.py
     deps:
@@ -28,9 +36,8 @@ stages:
   model_registering:
     cmd: python src/model_registering.py
     deps:
+      - registered_metadata.json
       - src/model_registering.py
       - validation_metadata.json
     params:
       - model_register
-    outs:
-      - registered_metadata.json

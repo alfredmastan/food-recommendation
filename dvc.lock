@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/processed_cookbook.pkl
       hash: md5
-      md5: dd076aad41804d5b26fd0c080f4fa6d7
-      size: 3355448
+      md5: fe2fe3917845db42c583c1adcba65aef
+      size: 3095875
     - path: src/model_training.py
       hash: md5
       md5: 321ef58f60c20ed8be180ba38fc14fa5
@@ -15,7 +15,7 @@ stages:
       params.yaml:
         model_pipeline.fast_text:
           vector_size: 100
-          window: 5
+          window: 8
           sg: 0
           epochs: 100
         model_pipeline.model_scoring:
@@ -25,15 +25,15 @@ stages:
     outs:
     - path: models/fasttext.model
       hash: md5
-      md5: 6a1a56209a04179eb462c8ff29d6d491
-      size: 1016976
+      md5: 99d095155db6b012f9fd2706fe9a5d88
+      size: 977600
     - path: models/fasttext.model.wv.vectors_ngrams.npy
       hash: md5
-      md5: eb322923cff71ca53ede5f01cdc679d8
+      md5: 038c9b5b9ecc977e1894c6e2cbd1bf6e
       size: 800000128
     - path: training_metadata.json
       hash: md5
-      md5: a284138e6d6ea083bf4c1d6909c12161
+      md5: 4fe258e40e1ae39df1b8e4b0a024c47b
       size: 740
   model_evaluation:
     cmd: python src/model_evaluation.py
@@ -44,7 +44,7 @@ stages:
       size: 4741
     - path: training_metadata.json
       hash: md5
-      md5: a284138e6d6ea083bf4c1d6909c12161
+      md5: 4fe258e40e1ae39df1b8e4b0a024c47b
       size: 740
     params:
       params.yaml:
@@ -55,25 +55,40 @@ stages:
     outs:
     - path: validation_metadata.json
       hash: md5
-      md5: 83104dd2423ff6b0258b917c4a76107e
-      size: 1126
+      md5: 2429610b7f0aa6877963b11b2efb887d
+      size: 1128
   model_registering:
     cmd: python src/model_registering.py
     deps:
+    - path: registered_metadata.json
+      hash: md5
+      md5: 2429610b7f0aa6877963b11b2efb887d
+      size: 1128
     - path: src/model_registering.py
       hash: md5
-      md5: 66e168b86d14476f9b861528dd37f54b
-      size: 2866
+      md5: 86b19d6c2200c88f27ab1e3b15491b46
+      size: 3553
     - path: validation_metadata.json
       hash: md5
-      md5: 83104dd2423ff6b0258b917c4a76107e
-      size: 1126
+      md5: 2429610b7f0aa6877963b11b2efb887d
+      size: 1128
     params:
       params.yaml:
         model_register:
           max_runs: 3
-    outs:
-    - path: registered_metadata.json
+  data_preprocessing:
+    cmd: python src/data_preprocessing.py
+    deps:
+    - path: data/complete_cookbook.pkl
       hash: md5
-      md5: 83104dd2423ff6b0258b917c4a76107e
-      size: 1126
+      md5: 5131f6a43f3a4aa6c03c2a7d1b004359
+      size: 14541929
+    - path: src/data_preprocessing.py
+      hash: md5
+      md5: 3f0b1e41fe6bbcbf9dee9318d4971a7a
+      size: 8488
+    outs:
+    - path: data/processed_cookbook.pkl
+      hash: md5
+      md5: fe2fe3917845db42c583c1adcba65aef
+      size: 3095875
