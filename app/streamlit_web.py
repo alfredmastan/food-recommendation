@@ -12,6 +12,7 @@ from datetime import datetime
 import requests
 import json
 import time
+import os
 import yaml
 
 #########################################################################################################################
@@ -152,7 +153,7 @@ def load_params():
 #-- Preparing the content
 params = load_params()
 table = connect_database()  # Connect to the DynamoDB table
-data = load_data(params["model_pipeline"]["recipe_path"]) # Load the main data
+data = load_data(os.path.join("../", params["model_pipeline"]["recipe_path"])) # Load the main data
 load_user_config() # Load user configurations from DynamoDB if logged in
 
 #########################################################################################################################

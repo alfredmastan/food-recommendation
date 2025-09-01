@@ -4,6 +4,7 @@ import uvicorn
 import mlflow
 import numpy as np
 import yaml
+import os
 import pandas as pd
 import json
 
@@ -28,13 +29,13 @@ import json
 with open("../registered_metadata.json", "r") as f:
     metadata = json.load(f)
 
-# Load params
-with open("../params.yaml", "r") as f:
-    params = yaml.safe_load(f)
+# # Load params
+# with open("../params.yaml", "r") as f:
+#     params = yaml.safe_load(f)
 
 # Load MLflow model
 mlflow.set_tracking_uri("http://127.0.0.1:8080")
-model = mlflow.pyfunc.load_model(metadata["local_uri"])
+model = mlflow.pyfunc.load_model(os.path.join("../", metadata["local_uri"]))
 
 # Create FastAPI app
 app = FastAPI(title="Food-Recipe_Model-API")
