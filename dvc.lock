@@ -9,8 +9,8 @@ stages:
       size: 3355448
     - path: src/model_training.py
       hash: md5
-      md5: b62d05b646ac3a1208f00da2e7e4ab5a
-      size: 5375
+      md5: 321ef58f60c20ed8be180ba38fc14fa5
+      size: 5385
     params:
       params.yaml:
         model_pipeline.fast_text:
@@ -25,13 +25,55 @@ stages:
     outs:
     - path: models/fasttext.model
       hash: md5
-      md5: 157815be24d3cf2c5a7544d1e437fdec
-      size: 1016975
+      md5: 6a1a56209a04179eb462c8ff29d6d491
+      size: 1016976
     - path: models/fasttext.model.wv.vectors_ngrams.npy
       hash: md5
-      md5: 46cd2f35a27985dc77791be295e88942
+      md5: eb322923cff71ca53ede5f01cdc679d8
       size: 800000128
     - path: training_metadata.json
       hash: md5
-      md5: 05d4f86d7edc314f8b4e1cbda22a7fb8
+      md5: a284138e6d6ea083bf4c1d6909c12161
       size: 740
+  model_evaluation:
+    cmd: python src/model_evaluation.py
+    deps:
+    - path: src/model_evaluation.py
+      hash: md5
+      md5: 3201934698533a83505292a9a7a30b58
+      size: 4741
+    - path: training_metadata.json
+      hash: md5
+      md5: a284138e6d6ea083bf4c1d6909c12161
+      size: 740
+    params:
+      params.yaml:
+        model_evaluation:
+          seed: 42
+          k: 10
+          relevant_thresh: 0.5
+    outs:
+    - path: validation_metadata.json
+      hash: md5
+      md5: 83104dd2423ff6b0258b917c4a76107e
+      size: 1126
+  model_registering:
+    cmd: python src/model_registering.py
+    deps:
+    - path: src/model_registering.py
+      hash: md5
+      md5: 66e168b86d14476f9b861528dd37f54b
+      size: 2866
+    - path: validation_metadata.json
+      hash: md5
+      md5: 83104dd2423ff6b0258b917c4a76107e
+      size: 1126
+    params:
+      params.yaml:
+        model_register:
+          max_runs: 3
+    outs:
+    - path: registered_metadata.json
+      hash: md5
+      md5: 83104dd2423ff6b0258b917c4a76107e
+      size: 1126

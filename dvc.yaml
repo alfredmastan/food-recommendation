@@ -1,0 +1,36 @@
+params:
+  - params.yaml
+
+stages:
+  model_training:
+    cmd: python src/model_training.py
+    deps:
+      - src/model_training.py
+      - data/processed_cookbook.pkl
+    params:
+      - model_pipeline.fast_text
+      - model_pipeline.model_scoring
+    outs:
+      - models/fasttext.model
+      - models/fasttext.model.wv.vectors_ngrams.npy
+      - training_metadata.json
+    
+  model_evaluation:
+    cmd: python src/model_evaluation.py
+    deps:
+      - src/model_evaluation.py
+      - training_metadata.json
+    params:
+      - model_evaluation
+    outs:
+      - validation_metadata.json
+
+  model_registering:
+    cmd: python src/model_registering.py
+    deps:
+      - src/model_registering.py
+      - validation_metadata.json
+    params:
+      - model_register
+    outs:
+      - registered_metadata.json
