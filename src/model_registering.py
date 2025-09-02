@@ -32,44 +32,41 @@ def main():
     # Get the highest performance and oldest run
     print("Getting the best run...")
     mlflow.set_tracking_uri("http://127.0.0.1:8080")
-    # Get the highest performance and oldest run
+    
     runs = mlflow.search_runs(experiment_names=["FastText-Model"])
     sorted_runs = runs.sort_values(by=["start_time", "metrics.RMSE", "metrics.MSE", "metrics.MAE"], ascending=True)
     sorted_runs = sorted_runs.sort_values(by=["metrics.Hit-Rate", "metrics.MAP", "metrics.MRR", "metrics.NDCG",  "metrics.F1_10"], ascending=False)
     best_run = sorted_runs.iloc[0]
 
-    # Check if any registered model exists
-    if mlflow.search_registered_models():
-        # Get current registered model metadata
-        try:
-            with open("registered_metadata.json", "r") as f:
-                registered_metadata = json.load(f)
-        except:
-            raise ValueError("Could not find registered metadata. Delete registered model in MLFlow and try again.")
+    # Try to get current registered model metadata
+    try:
+        with open("registered_metadata.json", "r") as f:
+            registered_metadata = json.load(f)
+    except:
+        raise ValueError("Could not find registered metadata. Make sure registered_metadata.json exists and try again.")
 
-        if best_run["run_id"] == registered_metadata["run_id"]:
-            print("Current registered model is the best.")
-            return
+    # Check if the best run is the current registered model
+    if best_run["run_id"] == registered_metadata["run_id"]:
+        print("Current registered model is the best.")
+    else:
+        # Load validation model metadata
+        with open("validation_metadata.json", "r") as f:
+            metadata = json.load(f)
+        
+        # Write registered model metadata
+        with open("registered_metadata.json", "w") as f:
+            f.write(json.dumps(metadata, indent=4))
+        
+        # Register best model to MLFlow
+        with mlflow.start_run(run_id=best_run.run_id):
+            mlflow.register_model(
+                model_uri=metadata["server_uri"],
+                name="fasttext_model"
+            )
 
-    # Load validation model metadata
-    with open("validation_metadata.json", "r") as f:
-        metadata = json.load(f)
-    
-    # Save registered model metadata
-    with open("registered_metadata.json", "w") as f:
-        f.write(json.dumps(metadata, indent=4))
-    
-    # Register best model to MLFlow
-    with mlflow.start_run(run_id=best_run.run_id):
-        mlflow.register_model(
-            model_uri=metadata["server_uri"],
-            name="fasttext_model"
-        )
-
-    print("New best model registered.")
+        print("New best model registered.")
 
     print("Checking for old runs to delete...")
-    
     deprecate_runs = sorted_runs.iloc[params["model_register"]["max_runs"]:]
     if deprecate_runs.empty:
         print("No old runs to delete.")

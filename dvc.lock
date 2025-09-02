@@ -19,21 +19,21 @@ stages:
           sg: 0
           epochs: 100
         model_pipeline.model_scoring:
-          w_title: 0.1
+          w_title: 0.2
           w_cosine: 0.2
-          w_maxsim: 0.7
+          w_maxsim: 0.6
     outs:
     - path: models/fasttext.model
       hash: md5
-      md5: 99d095155db6b012f9fd2706fe9a5d88
+      md5: 1781fcfc95b08e68aae6a6a7ae3a6871
       size: 977600
     - path: models/fasttext.model.wv.vectors_ngrams.npy
       hash: md5
-      md5: 038c9b5b9ecc977e1894c6e2cbd1bf6e
+      md5: 62f7aa5a90a5af32c7efa00af86aece5
       size: 800000128
     - path: training_metadata.json
       hash: md5
-      md5: 4fe258e40e1ae39df1b8e4b0a024c47b
+      md5: 236014908aec4fc94836816c32e1a359
       size: 740
   model_evaluation:
     cmd: python src/model_evaluation.py
@@ -44,7 +44,7 @@ stages:
       size: 4741
     - path: training_metadata.json
       hash: md5
-      md5: 4fe258e40e1ae39df1b8e4b0a024c47b
+      md5: 236014908aec4fc94836816c32e1a359
       size: 740
     params:
       params.yaml:
@@ -55,23 +55,23 @@ stages:
     outs:
     - path: validation_metadata.json
       hash: md5
-      md5: 2429610b7f0aa6877963b11b2efb887d
-      size: 1128
+      md5: ea19fd747e35980b2357221bbb67859b
+      size: 1115
   model_registering:
     cmd: python src/model_registering.py
     deps:
     - path: registered_metadata.json
       hash: md5
-      md5: 2429610b7f0aa6877963b11b2efb887d
-      size: 1128
+      md5: ea19fd747e35980b2357221bbb67859b
+      size: 1115
     - path: src/model_registering.py
       hash: md5
-      md5: 86b19d6c2200c88f27ab1e3b15491b46
-      size: 3553
+      md5: 534016bdc0f924c768dbf36cbc8df1fb
+      size: 3507
     - path: validation_metadata.json
       hash: md5
-      md5: 2429610b7f0aa6877963b11b2efb887d
-      size: 1128
+      md5: ea19fd747e35980b2357221bbb67859b
+      size: 1115
     params:
       params.yaml:
         model_register:
