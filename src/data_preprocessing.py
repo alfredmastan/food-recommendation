@@ -40,6 +40,7 @@ def clean_recipe_title(title: string) -> string:
     Also removes certain words from the title and ensure capitalization.
     """
     line = re.sub(r"\s*\([^()]*\)\s*", "", title) # Remove text within parentheses
+    line = re.sub(r"\s*\{[^{}]*\}\s*", "", title) # Remove text within brackets
     line = re.sub(r"[^ \-a-zA-Z0-9()]*", "", line) # Replace unwanted characters with space
     line = re.sub(r"\s*\([^()]*", "", line) # Remove uncomplete parentheses
 
