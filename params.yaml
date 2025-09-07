@@ -1,3 +1,6 @@
+data_preprocessing:
+  raw_data_path: data/raw
+
 model_pipeline:
   model_path: models/fasttext.model
   model_ngram_path: models/fasttext.model.wv.vectors_ngrams.npy

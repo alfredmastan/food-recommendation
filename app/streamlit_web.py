@@ -15,9 +15,10 @@ import yaml
 #########################################################################################################################
 #-- Page Configuration
 st.set_page_config(layout="wide")
-
+dev = True; # Development mode
 #########################################################################################################################
 #-- Custom CSS to style hyperlinks
+# Remove underline from all links and change color to white
 st.markdown("""
 <style>
 /* Remove underline from all links and change color to white */
@@ -25,13 +26,19 @@ a {
     text-decoration: none !important;
     color: white !important; # change to black if dark mode is enabled
 }
+</style>
+""", unsafe_allow_html=True)
 
+# Hover effect for links
+st.markdown("""
+<style>
 /* Add hover effect to show it's still clickable */
 a:hover {
     text-decoration: none !important;
     color: #f0f0f0 !important;
     opacity: 0.8;
 }
+</style>
 """, unsafe_allow_html=True)
 
 #########################################################################################################################
@@ -46,22 +53,31 @@ def load_data(path: str) -> pd.DataFrame:
 ## Recommendation functions
 def update_recommendation(n_recipes):
     """Update the recommendation by resetting the display indices."""
-
+    # If no ingredients provided, show random recipes
+    if not st.session_state["ingredient_input"]:
+        st.session_state["displayed_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False)
+        return
+    
     # Call the recommendation API
     response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state["ingredient_input"]})
-    similarity_scores = np.asarray(json.loads(response.json()))
-    recommended_indices = np.argsort(similarity_scores)[::-1][:n_recipes]
     
-    st.toast(recommended_indices)
-
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. API call failed.")
+        return
+    
+    # Process the similarity scores from the response 
+    similarity_scores = np.asarray(json.loads(response.json()))
+    st.session_state["displayed_similarity_scores"] = np.sort(similarity_scores)[::-1][:n_recipes]
+    if dev:
+        st.toast(st.session_state["displayed_similarity_scores"])
 
-    if json.loads(response.json()):
-        st.session_state["displayed_recipe_indices"] = recommended_indices
+    # Get the top n_recipes indices based on similarity scores
+    recommended_indices = np.argsort(similarity_scores)[::-1][:n_recipes]
+    st.session_state["displayed_recipe_indices"] = recommended_indices
+   
+    if dev:
+        st.toast(recommended_indices)
         st.toast("RECOMMENDATION UPDATED")
-    else:
-        st.toast("Failed to fetch recommendations.")
 
 #########################################################################################################################
 #-- Database Management
@@ -83,46 +99,50 @@ n_rows = np.ceil(n_recipes/n_cols).astype(int) # Number of rows to display
 
 # Randomly select recipes to display initially
 if "displayed_recipe_indices" not in st.session_state:
-    st.session_state["displayed_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False) 
-
-preloaded_data = data[~data.index.isin(list(st.session_state["display_excluded_indices"]))] # Preloaded data for the selected recipes
+    update_recommendation(n_recipes)
 
 #########################################################################################################################
 #-- Main Page Content
-st.title("Food Recipes Recommendation")
-st.write("This is a simple web app for recommending food recipes using Word2Vec model.")
+st.markdown("<h1 style='text-align: center;'>Food Recipe Recommendation</h1>", unsafe_allow_html=True)
+# st.write("This is a simple web app for recommending food recipes using FastText model.")
 
-st.button("Recommend Recipes", key="recommend_recipes", on_click=update_recommendation, args=(n_recipes, ), use_container_width=True)
 
 ingredient_input = st.text_input("Enter your ingredients here...", key="chat_input")
 
-if ingredient_input:
+try:
+    # Process the input ingredients
     ingredients = [ingredient.strip() for ingredient in ingredient_input.split(",") if ingredient]
     st.session_state["ingredient_input"] = ingredients
     update_recommendation(n_recipes)
+
+    # Display the entered ingredients as badges
     ingredients = [f":blue-badge[{ingredient.strip()}]" for ingredient in ingredients]
     ings_str = " ".join(ingredients)
-    st.markdown("**Ingredients:**")
     st.markdown(ings_str)
-    
-st.subheader("Recommended Recipes")
+except:
+    st.session_state["ingredient_input"] = []
+
+st.button("Recommend Recipes", key="recommend_recipes", on_click=update_recommendation, args=(n_recipes, ), use_container_width=True)
+
 
 ## Create columns for displaying the recommended recipes
+st.subheader("Recommended Recipes")
 grid = st.columns(n_cols) * n_rows
 
 for i, card in enumerate(grid):
     try:
         # Get the index of the recipe to display
-        current_recipe = preloaded_data.iloc[st.session_state["displayed_recipe_indices"][i]]
+        current_recipe = data.iloc[st.session_state["displayed_recipe_indices"][i]]
 
         # Create a container for the recipe card
         container = card.container(border=True)
         with container:
             # Display the recipe image
-            st.image(f"{preloaded_data.image_url.iloc[st.session_state["displayed_recipe_indices"][i]]}", use_container_width=True)
+            st.image(f"{data.image_url.iloc[st.session_state["displayed_recipe_indices"][i]]}", use_container_width=True)
             
             # Show the similarity score
-            # st.badge(f"Similarity: {sims[displayed_recipe_indices[i]]*100:.0f}%", color="red")
+            if dev:
+                st.badge(f"Similarity: {st.session_state['displayed_similarity_scores'][i]*100:.0f}%", color="red")
 
             # Recipe title
             st.subheader(f"[{current_recipe.recipe_title}]({current_recipe.recipe_url})")
@@ -152,18 +172,20 @@ for i, card in enumerate(grid):
 
 #########################################################################################################################
 #-- Development Controls
-with st.sidebar:
-    st.header("Development Controls")
-    # Displayed Configurations
-    st.header("Displayed Configurations")
+if dev:
+    with st.sidebar:
+        st.header("Development Controls")
+        # Displayed Configurations
+        st.header("Displayed Configurations")
 
-    st.write(f"**Session Recipe Display Indices:**")
-    st.write(f"{st.session_state["displayed_recipe_indices"]}")
+        st.write(f"**Number of Recipes to Recommend:** {n_recipes}")
+        st.write(f"**Number of Columns:** {n_cols}")
+        st.write(f"**Number of Rows:** {n_rows}")
 
-    st.write("**Current Excluded Indices:**")
-    if not st.session_state["display_excluded_indices"]:
-        st.write("No recipes excluded yet.")
-    else:
-        st.write(f"{st.session_state["display_excluded_indices"]}")
-    
-    st.divider()
+        st.write(f"**Session Recipe Display Indices:**")
+        st.write(f"{st.session_state["displayed_recipe_indices"]}")
+
+        st.write(f"**Session Recipe Display Similarities:**")
+        st.write(f"{st.session_state["displayed_similarity_scores"]}")
+
+        st.divider()

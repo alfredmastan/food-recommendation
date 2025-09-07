@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import re
+import os
+import yaml
 
 # Importing necessary libraries for text processing
 import nltk
@@ -34,6 +36,11 @@ UNITS = ["cup", "cups", "tbsp", "tablespoon", "tsp", "teaspoon", "g", "kg", "oz"
 EXTRA_WORDS = PREP_WORDS + TEMP_WORDS + TASTE_WORDS + QUALITY_WORDS + SIZE_WORDS + STATE_WORDS + OTHER_WORDS + UNITS
 
 # Helper Functions
+def load_params():
+    with open("params.yaml") as f:
+        params = yaml.safe_load(f)
+    return params
+
 def clean_recipe_title(title: string) -> string:
     """
     Cleans the recipe title by removing characters that are not digits or alphabets and extra spaces.
@@ -73,8 +80,8 @@ def clean_ingredients(ingredients: list) -> list:
             
             # Surface level cleaning
             line = re.sub(r"(\s+(or|/){1}\s+)", "/", line) # Remove ingredient substitutes
-            # line = re.sub(r"(diamond crystal|premium-quality)", "", line) # Remove brands
-            # line = re.sub(r"(\w*\d\w*|½|¼|¾)", "", line) # Remove numbers
+            line = re.sub(r"(diamond crystal|premium-quality)", "", line) # Remove brands
+            line = re.sub(r"(\w*\d\w*|½|¼|¾)", "", line) # Remove numbers
 
             # Remove punctuations
             line = line.translate(translator)
@@ -94,10 +101,25 @@ def clean_ingredients(ingredients: list) -> list:
     return clean_ingredients
 
 def main():
-    # Load extracted data
-    print("Loading extracted data...")
-    complete_cookbook = pd.read_pickle("data/complete_cookbook.pkl")
+    # Load params
+    params = load_params()
+
+    # Combine raw data
+    print("Combining recipe data...")
+    pickle_files = []
+    for root, _, files in os.walk(params["data_preprocessing"]["raw_data_path"]):
+        for f in files:
+            if f.endswith(".pkl"):
+                pickle_files.append(os.path.join(root, f))
+
+    dfs = []
+    for path in pickle_files:
+        df = pd.read_pickle(path)
+        dfs.append(df)
+
+    complete_cookbook = pd.concat(dfs, axis=0)
     complete_cookbook = complete_cookbook.reset_index(drop=True)
+    print(f"Combined {len(pickle_files)} files with total {len(complete_cookbook)} recipes.")
 
     # Create a cleaned copy of the cookbook
     cleaned_cookbook = complete_cookbook.copy()
@@ -149,6 +171,7 @@ def main():
     print("Saving cleaned data...")
     cleaned_cookbook = cleaned_cookbook.reset_index(drop=True)
     cleaned_cookbook.to_pickle("data/processed_cookbook.pkl", protocol=4)
+    print(f"Final processed data contains total {len(cleaned_cookbook)} recipes.")
 
 if __name__ == "__main__":
     print(f"{'='*20} Starting data preprocessing pipeline. {'='*20}")

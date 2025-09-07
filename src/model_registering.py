@@ -38,15 +38,21 @@ def main():
     sorted_runs = sorted_runs.sort_values(by=["metrics.Hit-Rate", "metrics.MAP", "metrics.MRR", "metrics.NDCG",  "metrics.F1_10"], ascending=False)
     best_run = sorted_runs.iloc[0]
 
+    # if no registered_metadata -> register best model
+    # else -> check if best model is current registered model
+    #       -> if not, register best model
+
     # Try to get current registered model metadata
     try:
         with open("registered_metadata.json", "r") as f:
             registered_metadata = json.load(f)
     except:
-        raise ValueError("Could not find registered metadata. Make sure registered_metadata.json exists and try again.")
-
+        print("No registered model found. Registering best model...")
+        registered_metadata = None
+        return
+    
     # Check if the best run is the current registered model
-    if best_run["run_id"] == registered_metadata["run_id"]:
+    if best_run["run_id"] == registered_metadata.get("run_id", ""):
         print("Current registered model is the best.")
     else:
         # Load validation model metadata

@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/processed_cookbook.pkl
       hash: md5
-      md5: fe2fe3917845db42c583c1adcba65aef
-      size: 3095875
+      md5: a46627190257d367a4c25177cfc23eea
+      size: 2538228
     - path: src/model_training.py
       hash: md5
       md5: 321ef58f60c20ed8be180ba38fc14fa5
@@ -25,15 +25,15 @@ stages:
     outs:
     - path: models/fasttext.model
       hash: md5
-      md5: 1781fcfc95b08e68aae6a6a7ae3a6871
-      size: 977600
+      md5: 749c4d5cb71d9d4dd02e76df7b69c91e
+      size: 996027
     - path: models/fasttext.model.wv.vectors_ngrams.npy
       hash: md5
-      md5: 62f7aa5a90a5af32c7efa00af86aece5
+      md5: d77b49ecbb356c79883cd262d7d549af
       size: 800000128
     - path: training_metadata.json
       hash: md5
-      md5: 236014908aec4fc94836816c32e1a359
+      md5: 2561bd0093527a5991e678cbad0ccef7
       size: 740
   model_evaluation:
     cmd: python src/model_evaluation.py
@@ -44,7 +44,7 @@ stages:
       size: 4741
     - path: training_metadata.json
       hash: md5
-      md5: 236014908aec4fc94836816c32e1a359
+      md5: 2561bd0093527a5991e678cbad0ccef7
       size: 740
     params:
       params.yaml:
@@ -55,23 +55,23 @@ stages:
     outs:
     - path: validation_metadata.json
       hash: md5
-      md5: ea19fd747e35980b2357221bbb67859b
-      size: 1115
+      md5: 45ffc9168849494fbd5d163f002ef539
+      size: 1127
   model_registering:
     cmd: python src/model_registering.py
     deps:
     - path: registered_metadata.json
       hash: md5
-      md5: ea19fd747e35980b2357221bbb67859b
-      size: 1115
+      md5: 45ffc9168849494fbd5d163f002ef539
+      size: 1127
     - path: src/model_registering.py
       hash: md5
-      md5: 534016bdc0f924c768dbf36cbc8df1fb
-      size: 3507
+      md5: 72bc42218270dcb55b0cfb65529e53a0
+      size: 3679
     - path: validation_metadata.json
       hash: md5
-      md5: ea19fd747e35980b2357221bbb67859b
-      size: 1115
+      md5: 45ffc9168849494fbd5d163f002ef539
+      size: 1127
     params:
       params.yaml:
         model_register:
@@ -79,16 +79,17 @@ stages:
   data_preprocessing:
     cmd: python src/data_preprocessing.py
     deps:
-    - path: data/complete_cookbook.pkl
+    - path: data/raw
       hash: md5
-      md5: 5131f6a43f3a4aa6c03c2a7d1b004359
-      size: 14541929
+      md5: 80356053008bc482a964c060224b3ff7.dir
+      size: 3463939
+      nfiles: 6
     - path: src/data_preprocessing.py
       hash: md5
-      md5: 3f0b1e41fe6bbcbf9dee9318d4971a7a
-      size: 8488
+      md5: 5bb41660884adfa460694a4b57c84c44
+      size: 9215
     outs:
     - path: data/processed_cookbook.pkl
       hash: md5
-      md5: fe2fe3917845db42c583c1adcba65aef
-      size: 3095875
+      md5: a46627190257d367a4c25177cfc23eea
+      size: 2538228
