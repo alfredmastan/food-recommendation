@@ -3,6 +3,7 @@ import pandas as pd
 import re
 import os
 import yaml
+import ast
 
 # Importing necessary libraries for text processing
 import nltk
@@ -47,7 +48,7 @@ def clean_recipe_title(title: string) -> string:
     Also removes certain words from the title and ensure capitalization.
     """
     line = re.sub(r"\s*\([^()]*\)\s*", "", title) # Remove text within parentheses
-    line = re.sub(r"\s*\{[^{}]*\}\s*", "", title) # Remove text within brackets
+    line = re.sub(r"\s*\{[^{}]*\}\s*", "", line) # Remove text within brackets
     line = re.sub(r"[^ \-a-zA-Z0-9()]*", "", line) # Replace unwanted characters with space
     line = re.sub(r"\s*\([^()]*", "", line) # Remove uncomplete parentheses
 
@@ -119,6 +120,7 @@ def main():
 
     complete_cookbook = pd.concat(dfs, axis=0)
     complete_cookbook = complete_cookbook.reset_index(drop=True)
+    complete_cookbook.ingredients = complete_cookbook.ingredients.apply(lambda x: ast.literal_eval(x))
     print(f"Combined {len(pickle_files)} files with total {len(complete_cookbook)} recipes.")
 
     # Create a cleaned copy of the cookbook

@@ -48,8 +48,7 @@ def main():
             registered_metadata = json.load(f)
     except:
         print("No registered model found. Registering best model...")
-        registered_metadata = None
-        return
+        registered_metadata = {}
     
     # Check if the best run is the current registered model
     if best_run["run_id"] == registered_metadata.get("run_id", ""):
@@ -62,6 +61,7 @@ def main():
         # Write registered model metadata
         with open("registered_metadata.json", "w") as f:
             f.write(json.dumps(metadata, indent=4))
+            print("Registered model metadata updated.")
         
         # Register best model to MLFlow
         with mlflow.start_run(run_id=best_run.run_id):

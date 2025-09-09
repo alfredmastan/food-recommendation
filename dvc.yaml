@@ -36,7 +36,6 @@ stages:
   model_registering:
     cmd: python src/model_registering.py
     deps:
-      - registered_metadata.json
       - src/model_registering.py
       - validation_metadata.json
     params:

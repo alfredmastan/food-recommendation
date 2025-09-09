@@ -54,13 +54,14 @@ def load_data(path: str) -> pd.DataFrame:
 def update_recommendation(n_recipes):
     """Update the recommendation by resetting the display indices."""
     # If no ingredients provided, show random recipes
-    if not st.session_state["ingredient_input"]:
+    if "ingredient_input" not in st.session_state or st.session_state["ingredient_input"] == []:
         st.session_state["displayed_recipe_indices"] = np.random.choice(len(data), n_recipes, replace=False)
+        st.session_state["displayed_similarity_scores"] = np.array([0]*n_recipes)
         return
     
     # Call the recommendation API
     response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state["ingredient_input"]})
-    
+    st.toast("API call made.")
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. API call failed.")
         return
@@ -90,7 +91,6 @@ def load_params():
 #-- Preparing the content
 params = load_params()
 data = load_data(os.path.join("../", params["model_pipeline"]["recipe_path"])) # Load the main data
-
 #########################################################################################################################
 #-- Content Configurations
 n_recipes = params["model_service"]["n_recs"]  # Number of recipes to recommend
@@ -138,7 +138,7 @@ for i, card in enumerate(grid):
         container = card.container(border=True)
         with container:
             # Display the recipe image
-            st.image(f"{data.image_url.iloc[st.session_state["displayed_recipe_indices"][i]]}", use_container_width=True)
+            st.image(f"{data.img_url.iloc[st.session_state["displayed_recipe_indices"][i]]}", use_container_width=True)
             
             # Show the similarity score
             if dev:
@@ -166,7 +166,8 @@ for i, card in enumerate(grid):
                 ingredient_str.append(f":blue-badge[{clean_str}]")
             st.markdown(" ".join(ingredient_str))
 
-    except:
+    except Exception as e:
+        # st.toast(e)
         # If there are not enough recipes to fill the columns, skip the remaining columns
         continue
 
