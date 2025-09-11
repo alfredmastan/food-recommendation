@@ -16,8 +16,7 @@ stages:
       - src/model_training.py
       - data/processed_cookbook.pkl
     params:
-      - model_pipeline.fast_text
-      - model_pipeline.model_scoring
+      - model_pipeline
     outs:
       - models/fasttext.model
       - models/fasttext.model.wv.vectors_ngrams.npy

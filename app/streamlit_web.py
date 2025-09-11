@@ -61,7 +61,7 @@ def update_recommendation(n_recipes):
     
     # Call the recommendation API
     response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state["ingredient_input"]})
-    st.toast("API call made.")
+    
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. API call failed.")
         return
@@ -107,7 +107,7 @@ st.markdown("<h1 style='text-align: center;'>Food Recipe Recommendation</h1>", u
 # st.write("This is a simple web app for recommending food recipes using FastText model.")
 
 
-ingredient_input = st.text_input("Enter your ingredients here...", key="chat_input")
+ingredient_input = st.text_input("Write ingredients you have here...", key="chat_input")
 
 try:
     # Process the input ingredients
@@ -122,7 +122,7 @@ try:
 except:
     st.session_state["ingredient_input"] = []
 
-st.button("Recommend Recipes", key="recommend_recipes", on_click=update_recommendation, args=(n_recipes, ), use_container_width=True)
+# st.button("Recommend Recipes", key="recommend_recipes", on_click=update_recommendation, args=(n_recipes, ), use_container_width=True)
 
 
 ## Create columns for displaying the recommended recipes

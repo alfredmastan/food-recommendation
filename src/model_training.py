@@ -27,11 +27,17 @@ class RecipeFastText(mlflow.pyfunc.PythonModel):
         self.model = FastText.load(context.artifacts["model_path"])
         self.data = pd.read_pickle(context.artifacts["data_path"])
 
+        # Prepare IDF
+        self.idf = {}
+        for vocab in self.model.wv.index_to_key:
+            n_recipe_contains_vocab = self.data.ingredients.apply(lambda x: vocab in x).sum()
+            self.idf[vocab] = np.log(len(self.data.ingredients) / (n_recipe_contains_vocab + 1e-9))
+
         # Prepare ingredient vectors
         self.ingredient_vectors = []
         for ingredients in self.data.ingredients:
             # Get the vectors for the recipe ingredients and normalize them
-            embedding_vecs = [self.model.wv.get_vector(ing, norm=True) for ing in ingredients]
+            embedding_vecs = [self.model.wv.get_vector(ing, norm=True) * self.idf.get(ing, 1)  for ing in ingredients]
             self.ingredient_vectors.append(embedding_vecs)
 
         self.ingredient_vector_means = np.array([np.mean(ing_vector, axis=0) for ing_vector in self.ingredient_vectors])
@@ -51,6 +57,18 @@ class RecipeFastText(mlflow.pyfunc.PythonModel):
         
         # Get the vectors for the search query and normalize them
         query_vecs = np.array([self.model.wv.get_vector(input, norm=True) for input in model_input])
+
+        # Borrow IDF from top 3 most similar ingredients
+        idf_top_weights = self.params["model_scoring"]["idf_top_weights"] # Weights for top 3 similar ingredients
+
+        query_idfs = []
+        for query in query_vecs:
+            similar_ings = [ing for ing, _ in self.model.wv.similar_by_vector(query, topn=3)]
+            ing_idf = np.sum([weight * self.idf.get(similar_ing, 1) for similar_ing, weight in zip(similar_ings, idf_top_weights)])
+            query_idfs.append(ing_idf)
+
+        # Apply IDF 
+        query_vecs = np.array([(query_vec * query_idf) for query_vec, query_idf in zip(query_vecs, query_idfs)])
 
         # Calculate MaxSim for each recipe in the data
         # Might be slow for large amount of data
