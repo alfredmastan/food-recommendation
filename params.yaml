@@ -11,6 +11,9 @@ model_pipeline:
     window: 8
     sg: 0
     epochs: 100
+    hs: 1
+    seed: 42
+    min_count: 1
 
   model_scoring:
     w_title: 0.2 # Weight for title similarity
