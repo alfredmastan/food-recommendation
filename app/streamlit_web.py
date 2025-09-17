@@ -94,7 +94,7 @@ def update_recommendation(n_recipes):
         recommended_indices = np.argsort(similarity_scores)[::-1]
         st.session_state["displayed_similarity_scores"] = np.sort(similarity_scores[recommended_indices])[::-1][:n_recipes] # Update the displayed similarity scores
     else:
-        recommended_indices = np.random.choice(len(data)-1, len(data), replace=False)
+        recommended_indices = np.random.choice(len(data), len(data), replace=False)
         st.session_state["displayed_similarity_scores"] = np.array([0]*n_recipes) # Set the displayed similarity scores to zeros
 
     # Apply the filters to the recommended indices
@@ -243,7 +243,8 @@ for i, card in enumerate(grid):
                             <p style='font-size: 150%; font-weight: bold; text-align: right;'>{time_str}</p>", unsafe_allow_html=True)
                 
     except Exception as e:
-        st.toast(e)
+        if dev: 
+            st.toast(e)
         # If there are not enough recipes to fill the columns, skip the remaining columns
         continue
 

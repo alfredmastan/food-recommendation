@@ -27,7 +27,7 @@ QUALITY_WORDS = ["fresh", "freshly", "organic", "good", "quality", "extra", "pre
 
 SIZE_WORDS = ["large", "mini", "small", "medium", "jumbo", "extra", "extra-large", "extra-small", "sliced", "halved", "diced", "cubed", "peeled", "grated", "shredded", "quartered", "clove", "short-grain", "heaping"]
 
-STATE_WORDS = ["powder", "sauce", "boneless", "skinless", "skin", "cooked", "ripe", "coarse", "coarsely", "filet", "fillet", "fillets", "canned",
+STATE_WORDS = ["boneless", "skinless", "skin", "cooked", "ripe", "coarse", "coarsely", "filet", "fillet", "fillets", "canned",
                 "homemade", "used", "dried", "reserved", "packet", "ground", "uncooked", "pasteurized", "bonein", "skinon", "preserved", "raw", "cooking"]
 
 OTHER_WORDS = ["quality", "extra", "virgin", "extravirgin", "long", "high", "japanese", "combination", "diamond", "kosher", "stalk", "juice", "sea", "taste", "crystal", "choice"]
