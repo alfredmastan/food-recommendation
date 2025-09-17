@@ -49,6 +49,9 @@ async def recommend_search(query: list[str] = Query(default=[],
     Search for recipes based on a query string.
     """
 
+    if not query:
+        return json.dumps([])
+    
     rec_idx = model.predict(query)
     return json.dumps(rec_idx.tolist())
 
