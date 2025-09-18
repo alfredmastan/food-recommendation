@@ -169,7 +169,7 @@ if 'scroll_to_top' not in st.session_state:
     st.session_state.scroll_to_top = False
 
 if st.session_state.scroll_to_top:
-    scroll_to_here(key='top')  # Scroll to the top of the page
+    scroll_to_here(0, key='top')  # Scroll to the top of the page
     st.session_state.scroll_to_top = False  # Reset the state after scrolling
 
 st.markdown("<h1 style='text-align: center;'>Food Recipe Recommendation</h1><br>", unsafe_allow_html=True)
@@ -303,9 +303,10 @@ for i in range(len(page_cols[1:-1])):
     if st.session_state.get("page", 0) == i:
         page_cols[i+1].markdown(f"<span style='font-size: 150%; font-weight: bold; text-decoration: underline;'>{i+1}</span>", unsafe_allow_html=True)
     else:
-        if page_cols[i+1].button(f"{i+1}", type="tertiary", on_click=scroll_to_top):
+        if page_cols[i+1].button(f"{i+1}", type="tertiary"):
             st.session_state["page"] = i
             display_recommendations()
+            scroll_to_top()
             st.rerun()
 
 #########################################################################################################################
