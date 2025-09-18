@@ -84,7 +84,6 @@ def update_recommendation(n_recipes):
 
         for condition in conditions:
             col, threshold, direction = condition
-            st.toast(f"Applying filter: {filter} - {col} {direction} than {threshold}")
             if direction == "lower":
                 mask = mask.intersection(data[data[col] <= threshold].index.to_numpy())
             else:
@@ -179,7 +178,6 @@ with input_cols[1]:
     for filter in nutrition_filter_map.keys():
         if filter in nutrition_filters:
             st.session_state[filter] = True
-            st.toast(f"{filter}: {st.session_state[filter]}")
         else:
             st.session_state[filter] = False
 

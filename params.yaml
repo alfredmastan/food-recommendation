@@ -12,7 +12,7 @@ model_pipeline:
     sg: 0
     epochs: 100
     hs: 1
-    seed: 42
+    seed: 1234
     min_count: 1
 
   model_scoring:

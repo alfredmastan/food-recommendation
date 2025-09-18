@@ -153,6 +153,7 @@ def main():
     cleaned_cookbook.total_time = cleaned_cookbook.total_time.fillna(cleaned_cookbook.prep_time + cleaned_cookbook.cook_time + cleaned_cookbook.custom_time)
     cleaned_cookbook = cleaned_cookbook.dropna(subset="total_time")
     cleaned_cookbook[["prep_time", "cook_time", "custom_time"]] = cleaned_cookbook[["prep_time", "cook_time", "custom_time"]].fillna(0)
+    cleaned_cookbook.total_time = cleaned_cookbook.prep_time + cleaned_cookbook.cook_time + cleaned_cookbook.custom_time
 
     ## Fill NA macros and micros with 0s
     fill_idx = cleaned_cookbook.columns[8:-1]
@@ -168,6 +169,9 @@ def main():
 
     # Convert recipe_title to string to avoid type errors
     cleaned_cookbook.recipe_title = cleaned_cookbook.recipe_title.astype(str)
+
+    # Create ingredients count variable
+    cleaned_cookbook["num_ingredients"] = cleaned_cookbook.ingredients.apply(lambda x: len(x))
 
     # Export cleaned cookbook
     print("Saving cleaned data...")
