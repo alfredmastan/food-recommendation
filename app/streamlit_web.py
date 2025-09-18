@@ -11,6 +11,7 @@ import requests
 import json
 import os
 import yaml
+import re 
 
 #########################################################################################################################
 #-- Page Configuration
@@ -42,8 +43,7 @@ a:hover {
 """, unsafe_allow_html=True)
 
 # Adjust metric font size
-st.markdown(
-    """
+st.markdown("""
 <style>
 [data-testid="stMetricValue"] {
     font-size: 100%;
@@ -78,14 +78,17 @@ def update_recommendation(n_recipes):
 
     # Apply filters if any (Hard filter)
     mask = set(range(len(data))) # Indexes of all recipes
-    for filter, (col, threshold, direction) in filters.items():
+    for filter, conditions in nutrition_filter_map.items():
         if not st.session_state.get(filter, False):
             continue
-            
-        if direction == "lower":
-            mask = mask.intersection(data[data[col] <= threshold].index.to_numpy())
-        else:
-            mask = mask.intersection(data[data[col] >= threshold].index.to_numpy())
+
+        for condition in conditions:
+            col, threshold, direction = condition
+            st.toast(f"Applying filter: {filter} - {col} {direction} than {threshold}")
+            if direction == "lower":
+                mask = mask.intersection(data[data[col] <= threshold].index.to_numpy())
+            else:
+                mask = mask.intersection(data[data[col] >= threshold].index.to_numpy())
 
     mask = list(mask) # Convert to list for indexing
     
@@ -120,53 +123,74 @@ def load_params():
 #-- Preparing the content
 params = load_params()
 data = load_data(os.path.join("../", params["model_pipeline"]["recipe_path"])) # Load the main data
+
 #########################################################################################################################
 #-- Content Configurations
 n_recipes = params["model_service"]["n_recs"]  # Number of recipes to recommend
-n_cols = 3 # Number of recipes to display in each row
+n_cols = 4 # Number of recipes to display in each row
 n_rows = np.ceil(n_recipes/n_cols).astype(int) # Number of rows to display
 
-filters = {"High Protein": ["protein", 25, "higher"],
-           "High Fiber": ["fiber", 15, "higher"],
-           "Low Carb": ["carbohydrates", 50, "lower"],
-           "Low Calorie": ["calories", 500, "lower"],
-           "Low Fat": ["fat", 20, "lower"],
-           "Quick and Easy": ["total_time", 30, "lower"]}
+# Define the available filters
+nutrition_filter_map = {"High Protein": [["protein", 25, "higher"]],
+           "High Fiber": [["fiber", 15, "higher"]],
+           "Low Carb": [["carbohydrates", 50, "lower"]],
+           "Low Calorie": [["calories", 500, "lower"]],
+           "Low Fat": [["fat", 20, "lower"]],
+           "Quick and Easy": [["num_steps", 10, "lower"], ["total_time", 30, "lower"], ["num_ingredients", 5, "lower"]]} # Special case, handled separately
 
-# Randomly select recipes to display initially
-if "displayed_recipe_indices" not in st.session_state:
-    update_recommendation(n_recipes)
+# Nutrition facts display mapping
+nutrition_facts_map = {
+    "Calories": ["calories", "kcal"],
+    "Protein": ["protein", "g"],
+    "Fat": ["fat", "g"],
+    "Carbs": ["carbohydrates", "g"],
+    "Fiber": ["fiber", "g"]
+}
 
 #########################################################################################################################
 #-- Main Page Content
 st.markdown("<h1 style='text-align: center;'>Food Recipe Recommendation</h1><br>", unsafe_allow_html=True)
 
-def switch_filters(filter: str):
-    """Switch the filter state and update recommendations."""
-    if st.session_state.get(filter, False):
-        st.session_state[filter] = True
-    else:
-        st.session_state[filter] = False
+# Input section
+input_cols = st.columns(2)
+with input_cols[0]:
+    st.markdown("<p style='text-align: left; font-weight: bold;'>Ingredients Input</p>", unsafe_allow_html=True)
+    
+    ingredient_input = st.multiselect(
+        "Ingredients Input",
+        [],
+        accept_new_options=True,
+        label_visibility="collapsed",
+    )
+    st.session_state["ingredient_input"] = ingredient_input
 
-with st.sidebar:
-    ingredient_input = st.text_input("Write ingredients you have here...", key="chat_input")
+    # Clean the input ingredients for highlighting
+    clean_input = [input.lower() for input in ingredient_input]
 
-    try:
-        # Process the input ingredients
-        input_ingredients = [ingredient.strip() for ingredient in ingredient_input.split(",") if ingredient]
-        st.session_state["ingredient_input"] = input_ingredients
-        update_recommendation(n_recipes)
+with input_cols[1]:
+    st.markdown("<p style='text-align: left; font-weight: bold;'>Nutrition Filters</p>", unsafe_allow_html=True)
+    nutrition_filters = st.multiselect(
+        "Nutrition Filters",
+        nutrition_filter_map.keys(),
+        accept_new_options=False,
+        label_visibility="collapsed",
+    )
+    
+    for filter in nutrition_filter_map.keys():
+        if filter in nutrition_filters:
+            st.session_state[filter] = True
+            st.toast(f"{filter}: {st.session_state[filter]}")
+        else:
+            st.session_state[filter] = False
 
-        # Display the entered ingredients as badges
-        input_string = [f":blue-badge[{ingredient.strip()}]" for ingredient in input_ingredients]
-        ings_str = " ".join(input_string)
-        st.markdown(ings_str)
-    except:
-        st.session_state["ingredient_input"] = []
+# Surprise Me! button
+if st.button("Surprise Me!", use_container_width=True):
+    st.session_state["ingredient_input"] = []
+    update_recommendation(n_recipes)
 
-    st.markdown("**Filters:**")
-    for i, filter in enumerate(filters.keys()):
-        st.checkbox(filter, key=filter, on_change=switch_filters, args=(filter,))
+# Grid display section
+## Update recommendation before displaying
+update_recommendation(n_recipes)
 
 ## Create grid for displaying the recommended recipes
 grid = st.columns(n_cols) * n_rows
@@ -188,46 +212,45 @@ for i, card in enumerate(grid):
             # Nutrition facts
             nutrition_cols = st.columns(5)
             nutrition_size = "70%"
-            value_size = "100%"
-            
-            with nutrition_cols[0]:
-                st.markdown(f"<p style='font-size: {nutrition_size}; margin: 0 auto 0 auto;'>Calories</p>\
-                            <p style='font-size: {value_size}; font-weight: bold;'>{current_recipe.calories:.0f} kcal</p>", unsafe_allow_html=True)
-            with nutrition_cols[1]:
-                st.markdown(f"<p style='font-size: {nutrition_size}; margin: 0 auto 0 auto;'>Protein</p>\
-                            <p style='font-size: {value_size}; font-weight: bold;'>{current_recipe.protein:.0f} g</p>", unsafe_allow_html=True)
-            with nutrition_cols[2]:
-                st.markdown(f"<p style='font-size: {nutrition_size}; margin: 0 auto 0 auto;'>Fat</p>\
-                            <p style='font-size: {value_size}; font-weight: bold;'>{current_recipe.fat:.0f} g</p>", unsafe_allow_html=True)
-            with nutrition_cols[3]:
-                st.markdown(f"<p style='font-size: {nutrition_size}; margin: 0 auto 0 auto;'>Carbs</p>\
-                            <p style='font-size: {value_size}; font-weight: bold;'>{current_recipe.carbohydrates:.0f} g</p>", unsafe_allow_html=True)
-            with nutrition_cols[4]:
-                st.markdown(f"<p style='font-size: {nutrition_size}; margin: 0 auto 0 auto;'>Fiber</p>\
-                            <p style='font-size: {value_size}; font-weight: bold;'>{current_recipe.fiber:.0f} g</p>", unsafe_allow_html=True)
+            value_size = "90%"
 
+            for nutrition_col, (nutrition_display, (nutrition_name, units)) in zip(nutrition_cols, nutrition_facts_map.items()):
+                if current_recipe[nutrition_name] == 0:
+                    nutrition_col.markdown(f"<p style='font-size: {nutrition_size}; margin: 0 auto 0 auto;'>{nutrition_display}</p>\
+                            <p style='font-size: {value_size}; font-weight: bold;'>N/A</p>", unsafe_allow_html=True)
+                else:
+                    nutrition_col.markdown(f"<p style='font-size: {nutrition_size}; margin: 0 auto 0 auto;'>{nutrition_display}</p>\
+                            <p style='font-size: {value_size}; font-weight: bold;'>{current_recipe[nutrition_name]:.0f} {units}</p>", unsafe_allow_html=True)
+                
+            st.markdown("<hr style='margin: 0 auto 5% auto;'>", unsafe_allow_html=True)
+        
             # Ingredients
-            st.markdown("<hr style='margin: 0 auto 0 auto;'>", unsafe_allow_html=True)
-            ing_cols = st.columns(2) * 10
+            ing_cols = st.columns(2) * 50
             for i_col, ingredient in enumerate(current_recipe.ingredients):
                 clean_str = ingredient.replace("_", " ").title()
-                if np.isin(ingredient.split("_"), input_ingredients).any():
-                    # Highlight the ingredient if it's in the input ingredients
-                    ing_cols[i_col].markdown(f"<li style='font-size: 80%; margin-bottom: 0; font-weight: bold; background-color:Tomato;'>{clean_str}</li>", unsafe_allow_html=True)
+
+                # Highlight the ingredient if it's in the input ingredients
+                if np.isin(re.split(r"[_|\/]", ingredient), clean_input).any():
+                    ing_cols[i_col].markdown(f"<li style='font-size: 80%; margin-bottom: 0; font-weight: bold; background-color:#ff4b4b; border-radius: 3.5px;'>{clean_str}</li>", unsafe_allow_html=True)
                 else:
                     ing_cols[i_col].markdown(f"<li style='font-size: 80%; margin-bottom: 0'>{clean_str}</li>", unsafe_allow_html=True)
-
+            
             st.markdown(f"<p style='font-size: 100%; margin: 5% auto 5% auto; text-align: right;'>\
                             <span style='font-size: 150%; font-weight: bold;'>{len(current_recipe.ingredients)}</span> ingredients\
                           </p>", unsafe_allow_html=True)
+            
+            st.markdown("<hr style='margin: 0 auto 5% auto;'>", unsafe_allow_html=True)
 
             # Similarity score
-            st.markdown("<hr style='margin: 0 auto 5% auto;'>", unsafe_allow_html=True)
             cols = st.columns([0.3, 0.7])
             
             with cols[0]:
-                st.markdown(f"<p style='font-size: 100%; margin: 0 auto 0 auto;'>Similarity</p>\
-                            <p style='font-size: 150%; font-weight: bold;'>{st.session_state['displayed_similarity_scores'][i]*100:.0f}%</p>", unsafe_allow_html=True)
+                if st.session_state['displayed_similarity_scores'][i] == 0:
+                    st.markdown(f"<p style='font-size: 100%; margin: 0 auto 0 auto;'>Similarity</p>\
+                            <p style='font-size: 150%; font-weight: bold;'>N/A</p>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"<p style='font-size: 100%; margin: 0 auto 0 auto;'>Similarity</p>\
+                                <p style='font-size: 150%; font-weight: bold;'>{st.session_state['displayed_similarity_scores'][i]*100:.0f}%</p>", unsafe_allow_html=True)
             
             # Total time
             with cols[1]:
@@ -243,8 +266,7 @@ for i, card in enumerate(grid):
                             <p style='font-size: 150%; font-weight: bold; text-align: right;'>{time_str}</p>", unsafe_allow_html=True)
                 
     except Exception as e:
-        if dev: 
-            st.toast(e)
+        # st.toast(e)
         # If there are not enough recipes to fill the columns, skip the remaining columns
         continue
 
@@ -265,5 +287,3 @@ if dev:
 
         st.write(f"**Session Recipe Display Similarities:**")
         st.write(f"{st.session_state["displayed_similarity_scores"]}")
-
-        st.divider()

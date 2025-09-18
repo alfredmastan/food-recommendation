@@ -1,15 +1,37 @@
 #!/bin/bash
 #Activate anaconda env --> ./start_server.sh
+
+# Wait for MLflow to be ready
+echo "Starting MLflow server..."
 GUNICORN_CMD_ARGS="--timeout 600" mlflow server --backend-store-uri="mlflow/mlruns" \
                                                 --artifacts-destination="mlflow/mlartifacts" \
                                                 --host 127.0.0.1 \
                                                 --port 8080 &
-cd app/ 
-streamlit run streamlit_web.py &
-cd ../dependencies/ 
+echo "Waiting for MLflow server to be ready..."
+while ! curl -s http://127.0.0.1:8080/health > /dev/null; do
+    sleep 2
+done
+echo "MLflow server is ready!"
+
+# Wait for model service to be ready
+echo "Starting model service..."
+cd dependencies/ 
 python model_service.py &
+echo "Waiting for model service to be ready..."
+while ! curl -s http://localhost:8000/docs > /dev/null; do
+    sleep 2
+done
+echo "Model service is ready!"
 
-echo "Waiting for servers to start..."
+# Wait for Streamlit to be ready
+echo "Starting Streamlit app..."
+cd ../app/ 
+streamlit run streamlit_web.py &
+echo "Waiting for Streamlit to be ready..."
+while ! curl -s http://localhost:8501 > /dev/null; do
+    sleep 2
+done
+echo "Streamlit app is ready!"
+
+echo "All servers started and ready!"
 wait
-echo "All servers started."
-
