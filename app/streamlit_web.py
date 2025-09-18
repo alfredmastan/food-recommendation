@@ -12,6 +12,7 @@ import json
 import os
 import yaml
 import re 
+from streamlit_scroll_to_top import scroll_to_here
 
 #########################################################################################################################
 #-- Page Configuration
@@ -56,25 +57,50 @@ st.markdown("""
 #########################################################################################################################
 #-- Helper Functions
 
-## Data and model loading functions
+## Load params
+@st.cache_data
+def load_params():
+    with open("../params.yaml") as f:
+        params = yaml.safe_load(f)
+    return params
+
+## Load data
 @st.cache_data
 def load_data(path: str) -> pd.DataFrame:
     """Load the main data and pre-trained Word2Vec model."""
     return pd.read_pickle(path)
 
 ## Recommendation functions
-def update_recommendation(n_recipes):
-    """Update the recommendation by resetting the display indices."""
-
+def fetch_recommendations():
+    """Fetch recommendations from the API based on the input ingredients."""
     # Call the recommendation API
-    response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state.get("ingredient_input", [])})
-    
+    response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})
+
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. API call failed.")
         return
     
     # Process the similarity scores from the response 
     similarity_scores = np.asarray(json.loads(response.json()))
+    st.session_state["raw_similarity"] = similarity_scores if similarity_scores.size != 0 else np.array([0]*len(data))
+
+    # Sort the similarity scores, if none, show random recipes from filtered recipes
+    if len(similarity_scores) != 0:
+        st.session_state["raw_recommendation"] = np.argsort(similarity_scores)[::-1]
+    else:
+        st.session_state["raw_recommendation"] = np.random.choice(len(data), len(data), replace=False)
+
+    st.session_state["page"] = 0 # Reset to first page
+    display_recommendations() # Update the displayed recommendations
+
+def update_filters():
+    """Update the filter mask from raw data indices."""
+    # Update the individual filter states
+    for filter in nutrition_filter_map.keys():
+        if filter in st.session_state.get("nutrition_filters", []):
+            st.session_state[filter] = True
+        else:
+            st.session_state[filter] = False
 
     # Apply filters if any (Hard filter)
     mask = set(range(len(data))) # Indexes of all recipes
@@ -84,39 +110,30 @@ def update_recommendation(n_recipes):
 
         for condition in conditions:
             col, threshold, direction = condition
+            st.toast(f"Applying filter: {filter} - {col} {direction} than {threshold}")
             if direction == "lower":
                 mask = mask.intersection(data[data[col] <= threshold].index.to_numpy())
             else:
                 mask = mask.intersection(data[data[col] >= threshold].index.to_numpy())
 
-    mask = list(mask) # Convert to list for indexing
+    st.session_state["filter_mask"] = list(mask) # Convert to list for indexing
+    st.session_state["page"] = 0 # Reset to first page
+    display_recommendations() # Update the displayed recommendations based on the new filter
+
+def display_recommendations():
+    """Display the recommended recipes based on the current filters and pagination."""
+    raw_recommendation = st.session_state["raw_recommendation"]
+    mask = st.session_state.get("filter_mask", raw_recommendation)
+
+    # Apply mask to the raw recommended indices
+    recommended_indices = raw_recommendation[np.isin(raw_recommendation, mask)]
+ 
+    # Select the top N recipes and its similarity scores to display
+    range_recipes_display = np.array([0, n_recipes]) + (st.session_state.get("page", 0) * n_recipes) # Range of recipes to display
+    st.session_state["displayed_recipe_indices"] = recommended_indices[range_recipes_display[0]:range_recipes_display[1]]
+    st.session_state["displayed_similarity_scores"] = st.session_state["raw_similarity"][recommended_indices][range_recipes_display[0]:range_recipes_display[1]] # Update the displayed similarity scores
+    st.session_state["final_recommendation"] = recommended_indices # Store the final recommendation list after filtering
     
-    # Sort the similarity scores, if none, show random recipes from filtered recipes
-    if len(similarity_scores) != 0:
-        recommended_indices = np.argsort(similarity_scores)[::-1]
-        st.session_state["displayed_similarity_scores"] = np.sort(similarity_scores[recommended_indices])[::-1][:n_recipes] # Update the displayed similarity scores
-    else:
-        recommended_indices = np.random.choice(len(data), len(data), replace=False)
-        st.session_state["displayed_similarity_scores"] = np.array([0]*n_recipes) # Set the displayed similarity scores to zeros
-
-    # Apply the filters to the recommended indices
-    recommended_indices = recommended_indices[np.isin(recommended_indices, mask)]
-
-    # Select the top N recipes
-    st.session_state["displayed_recipe_indices"] = recommended_indices[:n_recipes]
-
-    if dev:
-        st.toast(f"Filtered recipe length: {len(mask)}")
-        st.toast(st.session_state["displayed_recipe_indices"])
-        st.toast(recommended_indices)
-        st.toast("RECOMMENDATION UPDATED")
-
-#########################################################################################################################
-#-- Database Management
-def load_params():
-    with open("../params.yaml") as f:
-        params = yaml.safe_load(f)
-    return params
 
 #########################################################################################################################
 #-- Preparing the content
@@ -145,26 +162,36 @@ nutrition_facts_map = {
     "Carbs": ["carbohydrates", "g"],
     "Fiber": ["fiber", "g"]
 }
-
 #########################################################################################################################
 #-- Main Page Content
+# Back to top management
+if 'scroll_to_top' not in st.session_state:
+    st.session_state.scroll_to_top = False
+
+if st.session_state.scroll_to_top:
+    scroll_to_here(key='top')  # Scroll to the top of the page
+    st.session_state.scroll_to_top = False  # Reset the state after scrolling
+
 st.markdown("<h1 style='text-align: center;'>Food Recipe Recommendation</h1><br>", unsafe_allow_html=True)
 
 # Input section
 input_cols = st.columns(2)
+
 with input_cols[0]:
-    st.markdown("<p style='text-align: left; font-weight: bold;'>Ingredients Input</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: left; font-weight: bold;'>Ingredients</p>", unsafe_allow_html=True)
     
-    ingredient_input = st.multiselect(
-        "Ingredients Input",
+    input_ingredients = st.multiselect(
+        "Ingredients",
         [],
         accept_new_options=True,
         label_visibility="collapsed",
+        default=[],
+        key="input_ingredients",
+        on_change=fetch_recommendations,
     )
-    st.session_state["ingredient_input"] = ingredient_input
 
     # Clean the input ingredients for highlighting
-    clean_input = [input.lower() for input in ingredient_input]
+    clean_input = [input.lower() for input in input_ingredients]
 
 with input_cols[1]:
     st.markdown("<p style='text-align: left; font-weight: bold;'>Nutrition Filters</p>", unsafe_allow_html=True)
@@ -173,22 +200,18 @@ with input_cols[1]:
         nutrition_filter_map.keys(),
         accept_new_options=False,
         label_visibility="collapsed",
+        key="nutrition_filters",
+        on_change=update_filters,
     )
     
-    for filter in nutrition_filter_map.keys():
-        if filter in nutrition_filters:
-            st.session_state[filter] = True
-        else:
-            st.session_state[filter] = False
-
 # Surprise Me! button
-if st.button("Surprise Me!", use_container_width=True):
-    st.session_state["ingredient_input"] = []
-    update_recommendation(n_recipes)
+if st.button("Surprise Me!", use_container_width=True, on_click=lambda: st.session_state.update({"input_ingredients": []})):
+    fetch_recommendations()
 
 # Grid display section
-## Update recommendation before displaying
-update_recommendation(n_recipes)
+# Initialize session states
+if "raw_recommendation" not in st.session_state:
+    fetch_recommendations()
 
 ## Create grid for displaying the recommended recipes
 grid = st.columns(n_cols) * n_rows
@@ -206,7 +229,6 @@ for i, card in enumerate(grid):
             
             # Recipe title
             st.markdown(f"<h3 style='font-weight: bold;'><a href='{current_recipe.recipe_url}'>{current_recipe.recipe_title}</a></h3>", unsafe_allow_html=True)
-            
             # Nutrition facts
             nutrition_cols = st.columns(5)
             nutrition_size = "70%"
@@ -267,6 +289,24 @@ for i, card in enumerate(grid):
         # st.toast(e)
         # If there are not enough recipes to fill the columns, skip the remaining columns
         continue
+
+st.markdown("<hr style='margin: 2% auto 2% auto;'>", unsafe_allow_html=True)
+
+# Pagination controls
+max_page = np.ceil(len(st.session_state["final_recommendation"]) / n_recipes).astype(int)
+page_cols = st.columns([10] + [1]*10 + [10], vertical_alignment="bottom") # Max 10 page buttons
+
+def scroll_to_top():
+    st.session_state.scroll_to_top = True
+
+for i in range(len(page_cols[1:-1])):
+    if st.session_state.get("page", 0) == i:
+        page_cols[i+1].markdown(f"<span style='font-size: 150%; font-weight: bold; text-decoration: underline;'>{i+1}</span>", unsafe_allow_html=True)
+    else:
+        if page_cols[i+1].button(f"{i+1}", type="tertiary", on_click=scroll_to_top):
+            st.session_state["page"] = i
+            display_recommendations()
+            st.rerun()
 
 #########################################################################################################################
 #-- Development Controls
