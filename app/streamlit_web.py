@@ -110,7 +110,6 @@ def update_filters():
 
         for condition in conditions:
             col, threshold, direction = condition
-            st.toast(f"Applying filter: {filter} - {col} {direction} than {threshold}")
             if direction == "lower":
                 mask = mask.intersection(data[data[col] <= threshold].index.to_numpy())
             else:
@@ -185,7 +184,6 @@ with input_cols[0]:
         [],
         accept_new_options=True,
         label_visibility="collapsed",
-        default=[],
         key="input_ingredients",
         on_change=fetch_recommendations,
     )
@@ -203,7 +201,7 @@ with input_cols[1]:
         key="nutrition_filters",
         on_change=update_filters,
     )
-    
+
 # Surprise Me! button
 if st.button("Surprise Me!", use_container_width=True, on_click=lambda: st.session_state.update({"input_ingredients": []})):
     fetch_recommendations()
@@ -286,7 +284,8 @@ for i, card in enumerate(grid):
                             <p style='font-size: 150%; font-weight: bold; text-align: right;'>{time_str}</p>", unsafe_allow_html=True)
                 
     except Exception as e:
-        # st.toast(e)
+        if dev:
+            st.toast(e)
         # If there are not enough recipes to fill the columns, skip the remaining columns
         continue
 
