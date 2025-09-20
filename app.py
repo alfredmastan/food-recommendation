@@ -137,11 +137,7 @@ def display_recommendations():
 #########################################################################################################################
 #-- Preparing the content
 params = load_params()
-<<<<<<< HEAD:app/streamlit_web.py
-data = load_data("data/final_cookbook.pkl") # Load the main data
-=======
 data = load_data("Data/final_cookbook.pkl") # Load the main data
->>>>>>> 00886dc (chore: Moved streamlit to root):app.py
 
 #########################################################################################################################
 #-- Content Configurations
