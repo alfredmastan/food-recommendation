@@ -80,9 +80,11 @@ def fetch_recommendations():
 
         if response.status_code != 200:
             st.error("Failed to connect to the recommendation API. Error code: " + str(response.status_code))
+            st.stop()
             return
     except:
         st.error("Failed to connect to the recommendation API. API service is not running.")
+        st.stop()
         return
 
     # Process the similarity scores from the response
