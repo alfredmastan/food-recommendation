@@ -5,10 +5,10 @@
 echo "Starting MLflow server..."
 GUNICORN_CMD_ARGS="--timeout 600" mlflow server --backend-store-uri="mlflow/mlruns" \
                                                 --artifacts-destination="mlflow/mlartifacts" \
-                                                --host 127.0.0.1 \
+                                                --host 0.0.0.0 \
                                                 --port 8080 &
 echo "Waiting for MLflow server to be ready..."
-while ! curl -s http://127.0.0.1:8080/health > /dev/null; do
+while ! curl -s http://0.0.0.0:8080/health > /dev/null; do
     sleep 2
 done
 echo "MLflow server is ready!"
@@ -18,7 +18,7 @@ echo "Starting model service..."
 cd dependencies/ 
 python model_service.py &
 echo "Waiting for model service to be ready..."
-while ! curl -s http://localhost:8000/docs > /dev/null; do
+while ! curl -s http://0.0.0.0:8000/docs > /dev/null; do
     sleep 2
 done
 echo "Model service is ready!"
@@ -28,7 +28,7 @@ echo "Starting Streamlit app..."
 cd ../app/ 
 streamlit run streamlit_web.py &
 echo "Waiting for Streamlit to be ready..."
-while ! curl -s http://localhost:8501 > /dev/null; do
+while ! curl -s http://0.0.0.0:8501 > /dev/null; do
     sleep 2
 done
 echo "Streamlit app is ready!"

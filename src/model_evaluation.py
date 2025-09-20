@@ -134,7 +134,7 @@ def main():
     # Set up MLflow tracking
     print("Logging to MLflow...")
     # Log metrics to MLflow
-    mlflow.set_tracking_uri("http://127.0.0.1:8080")
+    mlflow.set_tracking_uri("http://localhost:8080/")
     mlflow.set_experiment("FastText-Model")
 
     with mlflow.start_run(run_id=metadata["run_id"]):

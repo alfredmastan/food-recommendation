@@ -31,7 +31,7 @@ def main():
 
     # Get the highest performance and oldest run
     print("Getting the best run...")
-    mlflow.set_tracking_uri("http://127.0.0.1:8080")
+    mlflow.set_tracking_uri("http://localhost:8080/")
     
     runs = mlflow.search_runs(experiment_names=["FastText-Model"])
     sorted_runs = runs.sort_values(by=["start_time", "metrics.RMSE", "metrics.MSE", "metrics.MAE"], ascending=True)
@@ -69,6 +69,19 @@ def main():
                 model_uri=metadata["server_uri"],
                 name="fasttext_model"
             )
+
+        # Copy registered model artifacts to a separate directory
+        src_path = metadata["local_uri"]
+        dest_path = "dependencies/model/"
+        os.makedirs(dest_path, exist_ok=True)
+
+        if os.path.exists(src_path):
+            if os.path.exists(dest_path):
+                shutil.rmtree(dest_path)
+            shutil.copytree(src_path, dest_path)
+            print(f"Copied model artifacts from {src_path} to {dest_path}")
+        else:
+            print(f"Source path {src_path} does not exist. Cannot copy model artifacts.")
 
         print("New best model registered.")
 

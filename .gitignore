@@ -8,3 +8,4 @@ dvcstore/
 /registered_metadata.json
 mlruns/
 mlartifacts/
+dependencies/model/

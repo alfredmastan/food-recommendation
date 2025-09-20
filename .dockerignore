@@ -1,0 +1,17 @@
+*.DS_Store
+__pycache__/
+
+*.Dockerfile
+
+mlflow/
+mlruns/
+mlartifacts/
+
+.dvc/
+dvcstore/
+
+.git/
+*.gitignore
+**/config.local
+**/tmp
+**/cache

@@ -74,13 +74,13 @@ def load_data(path: str) -> pd.DataFrame:
 def fetch_recommendations():
     """Fetch recommendations from the API based on the input ingredients."""
     # Call the recommendation API
-    response = requests.post(f"http://localhost:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})
+    response = requests.post(f"http://0.0.0.0:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})
 
     if response.status_code != 200:
         st.toast("Failed to fetch recommendations. API call failed.")
         return
-    
-    # Process the similarity scores from the response 
+
+    # Process the similarity scores from the response
     similarity_scores = np.asarray(json.loads(response.json()))
     st.session_state["raw_similarity"] = similarity_scores if similarity_scores.size != 0 else np.array([0]*len(data))
 

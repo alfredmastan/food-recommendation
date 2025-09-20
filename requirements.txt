@@ -1,0 +1,8 @@
+numpy==1.26.4
+pandas==2.2.3
+requests==2.32.3
+
+streamlit==1.45.1
+streamlit_scroll_to_top==0.0.4
+
+mlflow==3.1.1 
