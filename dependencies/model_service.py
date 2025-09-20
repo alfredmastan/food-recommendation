@@ -6,7 +6,7 @@ import json
 
 # Preparation for Service ============================================================
 # Load MLflow model
-model = mlflow.pyfunc.load_model(os.path.join("../", "dependencies/model/"))
+model = mlflow.pyfunc.load_model(os.path.join("dependencies/model/"))
 
 # Create FastAPI app
 app = FastAPI(title="Food-Recipe_Model-API")

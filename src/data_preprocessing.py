@@ -177,6 +177,7 @@ def main():
     print("Saving cleaned data...")
     cleaned_cookbook = cleaned_cookbook.reset_index(drop=True)
     cleaned_cookbook.to_pickle("data/processed_cookbook.pkl", protocol=4)
+    cleaned_cookbook.to_pickle("data/final_cookbook.pkl", protocol=4) # A copy of final cookbook for streamlit app
     print(f"Final processed data contains total {len(cleaned_cookbook)} recipes.")
 
 if __name__ == "__main__":
