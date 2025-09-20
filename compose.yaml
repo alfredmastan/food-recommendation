@@ -6,15 +6,16 @@ services:
     ports:
       - 8000:8000
 
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: app.Dockerfile
-  #   depends_on:
-  #     - api
-  #   ports:
-  #     - 8501:8501
+  app:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    depends_on:
+      - api
+    ports:
+      - 8501:8501
 
+  # Optional: MLflow server for model tracking
   # mlflow:
   #   image: ghcr.io/mlflow/mlflow:v3.1.1
   #   ports:

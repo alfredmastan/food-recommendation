@@ -73,11 +73,16 @@ def load_data(path: str) -> pd.DataFrame:
 ## Recommendation functions
 def fetch_recommendations():
     """Fetch recommendations from the API based on the input ingredients."""
-    # Call the recommendation API
-    response = requests.post(f"http://0.0.0.0:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})
 
-    if response.status_code != 200:
-        st.toast("Failed to fetch recommendations. API call failed.")
+    try:
+        # Call the recommendation API
+        response = requests.post(f"http://api:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])}) # Use "http://api:8000/recommend/" to locally test with docker-compose
+
+        if response.status_code != 200:
+            st.error("Failed to connect to the recommendation API. Error code: " + str(response.status_code))
+            return
+    except:
+        st.error("Failed to connect to the recommendation API. API service is not running.")
         return
 
     # Process the similarity scores from the response
@@ -171,7 +176,7 @@ if st.session_state.scroll_to_top:
     scroll_to_here(0, key='top')  # Scroll to the top of the page
     st.session_state.scroll_to_top = False  # Reset the state after scrolling
 
-st.markdown("<h1 style='text-align: center;'>Food Recipe Recommendation</h1><br>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 300%; font-weight: bold;'>Food Recipe Recommendation</p><br>", unsafe_allow_html=True)
 
 # Input section
 input_cols = st.columns(2)
