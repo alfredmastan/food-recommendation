@@ -137,7 +137,7 @@ def display_recommendations():
 #########################################################################################################################
 #-- Preparing the content
 params = load_params()
-data = load_data(os.path.join("data/final_cookbook.pkl")) # Load the main data
+data = load_data("data/final_cookbook.pkl") # Load the main data
 
 #########################################################################################################################
 #-- Content Configurations
