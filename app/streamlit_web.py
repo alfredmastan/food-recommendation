@@ -60,7 +60,7 @@ st.markdown("""
 ## Load params
 @st.cache_data
 def load_params():
-    with open("../params.yaml") as f:
+    with open("params.yaml") as f:
         params = yaml.safe_load(f)
     return params
 
@@ -137,7 +137,7 @@ def display_recommendations():
 #########################################################################################################################
 #-- Preparing the content
 params = load_params()
-data = load_data(os.path.join("../", params["model_pipeline"]["recipe_path"])) # Load the main data
+data = load_data(os.path.join(params["model_pipeline"]["recipe_path"])) # Load the main data
 
 #########################################################################################################################
 #-- Content Configurations
