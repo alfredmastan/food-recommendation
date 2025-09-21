@@ -76,7 +76,8 @@ def fetch_recommendations():
 
     try:
         # Call the recommendation API
-        response = requests.post(f"http://api:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])}) # Use "http://api:8000/recommend/" to locally test with docker-compose
+        api_url = os.getenv("API_URL") or st.secrets.get("API_URL") or "http://localhost:8000/recommend/"
+        response = requests.post(api_url, params={"query": st.session_state.get("input_ingredients", [])})
 
         if response.status_code != 200:
             st.error("Failed to connect to the recommendation API. Error code: " + str(response.status_code))
