@@ -1,13 +1,12 @@
 ARG PYTHON_VERSION=3.12
 FROM public.ecr.aws/lambda/python:${PYTHON_VERSION} 
 
-WORKDIR ${LAMBDA_TASK_ROOT}/dependencies/
-# Copy the entire dependencies folder
-COPY dependencies/ .
-
 # Install system dependencies
+COPY dependencies/requirements.txt ${LAMBDA_TASK_ROOT}/
 RUN pip install -r requirements.txt
 
+# Copy the entire dependencies folder
+COPY dependencies/ ${LAMBDA_TASK_ROOT}/dependencies/
+
 # Set the CMD to your handler 
-WORKDIR ${LAMBDA_TASK_ROOT}/
 CMD ["dependencies.model_service.handler"]
