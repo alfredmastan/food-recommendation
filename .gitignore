@@ -8,7 +8,6 @@ mlartifacts/
 
 dvcstore/
 
-dependencies/model/
 training_metadata.json
 validation_metadata.json
 registered_metadata.json
