@@ -15,7 +15,7 @@ echo "MLflow server is ready!"
 
 # Wait for model service to be ready
 echo "Starting model service..." 
-python dependencies/model_service.py &
+python service/model_service.py &
 echo "Waiting for model service to be ready..."
 while ! curl -s http://0.0.0.0:8000/docs > /dev/null; do
     sleep 2
@@ -24,7 +24,7 @@ echo "Model service is ready!"
 
 # Wait for Streamlit to be ready
 echo "Starting Streamlit app..."
-streamlit run app/streamlit_web.py &
+streamlit run app.py &
 echo "Waiting for Streamlit to be ready..."
 while ! curl -s http://0.0.0.0:8501 > /dev/null; do
     sleep 2

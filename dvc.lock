@@ -90,8 +90,8 @@ stages:
     deps:
     - path: src/model_registering.py
       hash: md5
-      md5: fcb4ffbc4432f90ebbb70797d11a70f1
-      size: 4265
+      md5: de17d377548049e736150d74e1054fc3
+      size: 4260
     - path: validation_metadata.json
       hash: md5
       md5: 9553858161da5eec6d788424baa2ab03

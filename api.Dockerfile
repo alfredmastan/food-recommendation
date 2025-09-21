@@ -1,10 +1,10 @@
 ARG PYTHON_VERSION=3.12.3
 FROM python:${PYTHON_VERSION}-slim 
 
-WORKDIR /dependencies
+WORKDIR /service
 
-# Copy the entire dependencies folder
-COPY dependencies/ .
+# Copy the entire service folder
+COPY service/ .
 
 # Install system dependencies
 RUN pip install -r requirements.txt
@@ -13,4 +13,4 @@ EXPOSE 8000
 
 # Run FastAPI on port 8000
 WORKDIR /
-CMD ["python", "dependencies/model_service.py"]
+CMD ["python", "service/model_service.py"]

@@ -1,2 +1,2 @@
-dependencies/model/python_model.pkl filter=lfs diff=lfs merge=lfs -text
-dependencies/model/artifacts/fasttext.model.wv.vectors_ngrams.npy filter=lfs diff=lfs merge=lfs -text
+service/model/python_model.pkl filter=lfs diff=lfs merge=lfs -text
+service/model/artifacts/fasttext.model.wv.vectors_ngrams.npy filter=lfs diff=lfs merge=lfs -text

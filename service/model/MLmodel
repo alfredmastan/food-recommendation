@@ -1,0 +1,35 @@
+artifact_path: mlflow-artifacts:/395968226849530716/models/m-8ca24d3dbac94c11ad21d788c7fdee9e/artifacts
+flavors:
+  python_function:
+    artifacts:
+      data_path:
+        path: artifacts/processed_cookbook.pkl
+        uri: data/processed_cookbook.pkl
+      model_ngram_path:
+        path: artifacts/fasttext.model.wv.vectors_ngrams.npy
+        uri: models/fasttext.model.wv.vectors_ngrams.npy
+      model_path:
+        path: artifacts/fasttext.model
+        uri: models/fasttext.model
+    cloudpickle_version: 3.1.1
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.12.3
+    streamable: false
+is_signature_from_type_hint: true
+mlflow_version: 3.1.1
+model_id: m-8ca24d3dbac94c11ad21d788c7fdee9e
+model_size_bytes: 1688440139
+model_uuid: m-8ca24d3dbac94c11ad21d788c7fdee9e
+prompts: null
+run_id: 788451acd5eb455eade69d0c849de555
+signature:
+  inputs: '[{"type": "string", "required": true}]'
+  outputs: '[{"type": "double", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-09-20 17:29:02.792479'

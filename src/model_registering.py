@@ -72,7 +72,7 @@ def main():
 
         # Copy registered model artifacts to a separate directory
         src_path = metadata["local_uri"]
-        dest_path = "dependencies/model/"
+        dest_path = "service/model/"
         os.makedirs(dest_path, exist_ok=True)
 
         if os.path.exists(src_path):
