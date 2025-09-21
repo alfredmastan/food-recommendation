@@ -11,6 +11,9 @@ model = mlflow.pyfunc.load_model("dependencies/model/")
 # Create FastAPI app
 app = FastAPI(title="Food-Recipe_Model-API")
 
+# Handler for AWS Lambda
+handler = Mangum(app)
+
 # API Calls ============================================================
 @app.post("/recommend/")
 async def recommend_search(query: list[str] = Query(default=[],
@@ -26,5 +29,5 @@ async def recommend_search(query: list[str] = Query(default=[],
     rec_idx = model.predict(query)
     return json.dumps(rec_idx.tolist())
 
-# Handler for AWS Lambda ============================================================
-handler = Mangum(app)
+if __name__ == "__main__":
+    uvicorn.run(app="model_service:app", host="0.0.0.0", port=8000)

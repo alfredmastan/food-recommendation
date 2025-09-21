@@ -13,4 +13,4 @@ EXPOSE 8000
 
 # Run FastAPI on port 8000
 WORKDIR /
-CMD ["uvicorn", "dependencies.model_service:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["python", "dependencies/model_service.py"]
