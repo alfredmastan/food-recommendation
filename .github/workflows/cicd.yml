@@ -68,12 +68,12 @@ jobs:
 
       - name: Stop old container
         run: |
-          docker container stop ${{ secrets.AWS_ECR_IMAGE_URI }} || true
-          docker container rm ${{ secrets.AWS_ECR_IMAGE_URI }} || true
+          docker container stop foodrec || true
+          docker container rm foodrec || true
 
       - name: Run image on EC2 instance
         run: |
-          docker run -d -p 80:8000 ${{ secrets.AWS_ECR_IMAGE_URI }}:latest 
+          docker run -d -p 80:8000 --name foodrec ${{ secrets.AWS_ECR_IMAGE_URI }}:latest
 
       - name: Cleanup old containers
         run: |
