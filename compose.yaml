@@ -8,15 +8,6 @@ services:
     ports:
       - 8000:8000
 
-  api_lambda:
-    build:
-      context: .
-      dockerfile: api_lambda.Dockerfile
-    environment:
-      - API_URL=http://api:8000/recommend/
-    ports:
-      - 8000:8000
-
   app:
     build:
       context: .

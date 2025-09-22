@@ -5,7 +5,7 @@ FROM public.ecr.aws/lambda/python:${PYTHON_VERSION}
 COPY service/requirements.txt ${LAMBDA_TASK_ROOT}/
 RUN pip install -r requirements.txt
 
-# Copy the service code into the container
+# Copy the service files
 COPY service/model_service.py ${LAMBDA_TASK_ROOT}/service/model_service.py
 COPY service/model/ ${LAMBDA_TASK_ROOT}/service/model/
 
