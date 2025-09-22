@@ -1,10 +1,8 @@
 services:
-  api:
+  service:
     build:
       context: .
-      dockerfile: api.Dockerfile
-    environment:
-      - API_URL=http://api:8000/recommend/
+      dockerfile: service.Dockerfile
     ports:
       - 8000:8000
 
@@ -13,7 +11,9 @@ services:
       context: .
       dockerfile: app.Dockerfile
     depends_on:
-      - api
+      - service
+    environment:
+      - API_URL=http://service:8000/recommend/
     ports:
       - 8501:8501
 
