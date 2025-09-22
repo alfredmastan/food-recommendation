@@ -187,7 +187,7 @@ with input_cols[0]:
     
     input_ingredients = st.multiselect(
         "Ingredients",
-        [],
+        ["Chicken", "Tomato", "Rice", "Beef"],
         accept_new_options=True,
         label_visibility="collapsed",
         key="input_ingredients",
