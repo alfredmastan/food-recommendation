@@ -15,7 +15,7 @@ app = FastAPI(title="Food-Recipe_Model-API")
 async def read_root():
     return {"message": "Healthy!"}
 
-@app.post("/recommend/")
+@app.get("/recommend/")
 async def recommend_search(query: list[str] = Query(default=[],
                                               description="List of ingredients to search for",
                                               examples=["chicken", "rice"])):

@@ -73,14 +73,13 @@ def load_data(path: str) -> pd.DataFrame:
 ## Recommendation functions
 def fetch_recommendations():
     """Fetch recommendations from the API based on the input ingredients."""
-    
     try:
         # Call the recommendation API
         try:
             api_url = os.getenv("API_URL") or st.secrets.get("API_URL")
-            response = requests.post(api_url, params={"query": st.session_state.get("input_ingredients", [])})
+            response = requests.get(api_url, params={"query": st.session_state.get("input_ingredients", [])})
         except:
-            response = requests.post("http://localhost:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})
+            response = requests.get("http://localhost:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})
 
         if response.status_code != 200:
             st.error("Failed to connect to the recommendation API. Error code: " + str(response.status_code))

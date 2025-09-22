@@ -75,4 +75,8 @@ jobs:
         run: |
           docker run -d -p 80:8000 ${{ secrets.AWS_ECR_IMAGE_URI }}:latest
 
+      - name: Cleanup old containers
+        run: |
+          docker system prune -f
+
 
