@@ -15,9 +15,8 @@ model_pipeline:
     bucket: 50000
 
   model_scoring:
-    w_title: 0.2 # Weight for title similarity
-    w_cosine: 0.2 # Weight for mean cosine similarity between query and recipe ingredients (mean ingredients)
-    w_maxsim: 0.6 # Weight for max similarity between query and recipe ingredients (per ingredients)
+    w_title: 0.1 # Weight for title similarity
+    w_cosine: 0.9 # Weight for mean cosine similarity between query and recipe ingredients (mean ingredients)
     idf_top_weights: [0.8, 0.1, 0.1] # Weights for top 3 similar ingredients to borrow IDF from
 
 model_evaluation:

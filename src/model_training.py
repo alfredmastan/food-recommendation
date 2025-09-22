@@ -70,25 +70,12 @@ class RecipeFastText(mlflow.pyfunc.PythonModel):
         # Apply IDF 
         query_vecs = np.array([(query_vec * query_idf) for query_vec, query_idf in zip(query_vecs, query_idfs)])
 
-        # Calculate MaxSim for each recipe in the data
-        # Might be slow for large amount of data
-        ingredient_max_sim = np.array([])
-        for ing_vector in self.ingredient_vectors:
-            tokens_sim = cosine_similarity(query_vecs, ing_vector)
-
-            a_best = tokens_sim.max(axis=1)
-            b_best = tokens_sim.max(axis=0)
-            
-            score = 0.5 * (a_best.mean() + b_best.mean())
-            ingredient_max_sim = np.append(ingredient_max_sim, score)
-
         # Calculate cosine similarity between the mean query vector and the mean ingredients vector
         mean_query_vec = query_vecs.mean(axis=0)
         ingredient_sim = cosine_similarity(mean_query_vec.reshape(1, -1), self.ingredient_vector_means)
         title_sim = cosine_similarity(mean_query_vec.reshape(1, -1), self.title_vector_means)
 
         score = (self.params["model_scoring"]["w_cosine"] * ingredient_sim[0] +
-                self.params["model_scoring"]["w_maxsim"] * ingredient_max_sim +
                 self.params["model_scoring"]["w_title"] * title_sim[0])
 
         return score
@@ -126,7 +113,8 @@ def main():
             name="fasttext_model",
             python_model=fasttext_model,
             artifacts={"model_path": params["model_pipeline"]["model_path"],
-                    "data_path": params["model_pipeline"]["recipe_path"]}
+                    "data_path": params["model_pipeline"]["recipe_path"]},
+            pip_requirements=["gensim==4.3.3"]
         )
 
         # Log local URI

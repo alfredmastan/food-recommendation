@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: service.Dockerfile
+    volumes:
+      - ./service:/service
     ports:
       - 8000:8000
 
@@ -12,18 +14,21 @@ services:
       dockerfile: app.Dockerfile
     depends_on:
       - service
+    volumes:
+      - ./params.yaml:/params.yaml
+      - ./app.py:/app.py
+      - ./data:/Data
     environment:
       - API_URL=http://service:8000/recommend/
     ports:
       - 8501:8501
 
-  # Optional: MLflow server for model tracking
-  # mlflow:
-  #   image: ghcr.io/mlflow/mlflow:v3.1.1
-  #   ports:
-  #     - 8080:8080
-  #   environment:
-  #     MLFLOW_TRACKING_URI: "http://localhost:8080"
-  #   volumes:
-  #     - ./mlflow:/mlflow
-  #   command: mlflow server --backend-store-uri="mlflow/mlruns" --artifacts-destination="mlflow/mlartifacts" --host 0.0.0.0 --port 8080 
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.1.1
+    ports:
+      - 8080:8080
+    environment:
+      MLFLOW_TRACKING_URI: "http://localhost:8080"
+    volumes:
+      - ./mlflow:/mlflow
+    command: mlflow server --backend-store-uri="mlflow/mlruns" --artifacts-destination="mlflow/mlartifacts" --host 0.0.0.0 --port 8080 
