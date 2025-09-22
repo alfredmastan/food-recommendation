@@ -72,11 +72,9 @@ def fetch_recommendations():
     try:
         # Call the recommendation API
         try:
-            st.toast(os.getenv("API_URL"))
             api_url = os.getenv("API_URL") or st.secrets.get("API_URL")
             response = requests.get(api_url, params={"query": st.session_state.get("input_ingredients", [])})
         except:
-            st.toast("Using default localhost API URL.")
             response = requests.get("http://localhost:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})
 
         if response.status_code != 200:
