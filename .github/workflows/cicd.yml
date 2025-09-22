@@ -17,11 +17,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          lfs: true  # Ensure Git LFS files are fetched
-
-      - name: Pull LFS objects
-        run: git lfs pull
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v5.0.0
