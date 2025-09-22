@@ -22,7 +22,7 @@ st.markdown("""
 /* Remove underline from all links and change color to white */
 a {
     text-decoration: none !important;
-    color: white !important; # change to black if dark mode is enabled
+    color: inherit !important; # change to black if dark mode is enabled
 }
 </style>
 """, unsafe_allow_html=True)
@@ -233,6 +233,7 @@ for i, card in enumerate(grid):
             
             # Recipe title
             st.markdown(f"<h3 style='font-weight: bold;'><a href='{current_recipe.recipe_url}'>{current_recipe.recipe_title}</a></h3>", unsafe_allow_html=True)
+           
             # Nutrition facts
             nutrition_cols = st.columns(5)
             nutrition_size = "70%"
@@ -298,21 +299,25 @@ for i, card in enumerate(grid):
 st.markdown("<hr style='margin: 2% auto 2% auto;'>", unsafe_allow_html=True)
 
 # Pagination controls
-max_page = np.ceil(len(st.session_state["final_recommendation"]) / n_recipes).astype(int)
-page_cols = st.columns([10] + [1]*10 + [10], vertical_alignment="bottom") # Max 10 page buttons
+max_page = min(np.ceil(len(st.session_state["final_recommendation"]) / n_recipes).astype(int), 10) # Max 10 pages
+page_cols = st.columns([10] + [1]*max_page + [10], vertical_alignment="bottom")
 
 def scroll_to_top():
     st.session_state.scroll_to_top = True
 
 for i in range(len(page_cols[1:-1])):
-    if st.session_state.get("page", 0) == i:
-        page_cols[i+1].markdown(f"<span style='font-size: 150%; font-weight: bold; text-decoration: underline;'>{i+1}</span>", unsafe_allow_html=True)
-    else:
-        if page_cols[i+1].button(f"{i+1}", type="tertiary"):
-            st.session_state["page"] = i
-            display_recommendations()
-            scroll_to_top()
-            st.rerun()
+    try:
+        if st.session_state.get("page", 0) == i:
+            page_cols[i+1].markdown(f"<span style='font-size: 150%; font-weight: bold; text-decoration: underline;'>{i+1}</span>", unsafe_allow_html=True)
+        else:
+            if page_cols[i+1].button(f"{i+1}", type="tertiary"):
+                st.session_state["page"] = i
+                display_recommendations()
+                scroll_to_top()
+                st.rerun()
+    except:
+        # If there are not enough pages, skip the remaining page buttons
+        continue
 
 #########################################################################################################################
 #-- Development Controls
