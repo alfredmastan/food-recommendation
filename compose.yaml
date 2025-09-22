@@ -22,7 +22,7 @@ services:
       - API_URL=http://service:8000/recommend/
     ports:
       - 8501:8501
-
+      
   mlflow:
     image: ghcr.io/mlflow/mlflow:v3.1.1
     ports:

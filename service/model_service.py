@@ -13,7 +13,7 @@ app = FastAPI(title="Food-Recipe_Model-API")
 # API Calls ============================================================
 @app.get("/")
 async def read_root():
-    return {"message": "Connection successful."}
+    return {"message": "Connection successful!"}
 
 @app.get("/recommend/")
 async def recommend_search(query: list[str] = Query(default=[],
