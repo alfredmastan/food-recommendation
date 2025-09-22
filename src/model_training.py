@@ -126,9 +126,7 @@ def main():
             name="fasttext_model",
             python_model=fasttext_model,
             artifacts={"model_path": params["model_pipeline"]["model_path"],
-                    "model_ngram_path": params["model_pipeline"]["model_ngram_path"],
-                    "data_path": params["model_pipeline"]["recipe_path"]},
-            pip_requirements=["gensim==4.3.3"]
+                    "data_path": params["model_pipeline"]["recipe_path"]}
         )
 
         # Log local URI

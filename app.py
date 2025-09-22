@@ -76,9 +76,8 @@ def fetch_recommendations():
     
     try:
         # Call the recommendation API
-        api_url = os.getenv("API_URL") or st.secrets.get("API_URL")
-        
         try:
+            api_url = os.getenv("API_URL") or st.secrets.get("API_URL")
             response = requests.post(api_url, params={"query": st.session_state.get("input_ingredients", [])})
         except:
             response = requests.post("http://localhost:8000/recommend/", params={"query": st.session_state.get("input_ingredients", [])})

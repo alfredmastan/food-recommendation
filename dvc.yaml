@@ -19,7 +19,6 @@ stages:
       - model_pipeline
     outs:
       - models/fasttext.model
-      - models/fasttext.model.wv.vectors_ngrams.npy
       - training_metadata.json
     
   model_evaluation:

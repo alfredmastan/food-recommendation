@@ -1,13 +1,10 @@
-artifact_path: mlflow-artifacts:/395968226849530716/models/m-8ca24d3dbac94c11ad21d788c7fdee9e/artifacts
+artifact_path: mlflow-artifacts:/133055071910514833/models/m-8c31cf51e61443f48aafd177c0e59ff8/artifacts
 flavors:
   python_function:
     artifacts:
       data_path:
         path: artifacts/processed_cookbook.pkl
         uri: data/processed_cookbook.pkl
-      model_ngram_path:
-        path: artifacts/fasttext.model.wv.vectors_ngrams.npy
-        uri: models/fasttext.model.wv.vectors_ngrams.npy
       model_path:
         path: artifacts/fasttext.model
         uri: models/fasttext.model
@@ -22,14 +19,14 @@ flavors:
     streamable: false
 is_signature_from_type_hint: true
 mlflow_version: 3.1.1
-model_id: m-8ca24d3dbac94c11ad21d788c7fdee9e
-model_size_bytes: 1688440139
-model_uuid: m-8ca24d3dbac94c11ad21d788c7fdee9e
+model_id: m-8c31cf51e61443f48aafd177c0e59ff8
+model_size_bytes: 118792135
+model_uuid: m-8c31cf51e61443f48aafd177c0e59ff8
 prompts: null
-run_id: 788451acd5eb455eade69d0c849de555
+run_id: 59553bdd558a4b6d96700f7aed84708b
 signature:
   inputs: '[{"type": "string", "required": true}]'
   outputs: '[{"type": "double", "required": true}]'
   params: null
 type_hint_from_example: false
-utc_time_created: '2025-09-20 17:29:02.792479'
+utc_time_created: '2025-09-22 05:03:45.346127'

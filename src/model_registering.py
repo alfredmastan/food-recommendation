@@ -79,40 +79,12 @@ def main():
             if os.path.exists(dest_path):
                 shutil.rmtree(dest_path)
             shutil.copytree(src_path, dest_path)
-            print(f"Copied model artifacts from {src_path} to {dest_path}")
+            print(f"Copied model artifacts to {dest_path}")
         else:
             print(f"Source path {src_path} does not exist. Cannot copy model artifacts.")
 
         print("New best model registered.")
 
-    print("Checking for old runs to delete...")
-    deprecate_runs = sorted_runs.iloc[params["model_register"]["max_runs"]:]
-    if deprecate_runs.empty:
-        print("No old runs to delete.")
-        return
-    
-    for index, run in deprecate_runs.iterrows():
-        # Delete run from MLFlow
-        id = run["run_id"]
-        mlflow.delete_run(id)
-
-        # Delete run from local file system
-        run_path = os.path.join("mlflow/mlruns", run["experiment_id"], run["run_id"])
-        if os.path.exists(run_path):
-            print(f"Deleting local run directory: {run_path}")
-            shutil.rmtree(run_path)
-
-        # Delete model artifact from local file system
-        model_artifact_path = os.path.join(*run["params.local_uri"].split("/")[:-1])
-        if os.path.exists(model_artifact_path):
-            print(f"Deleting local model artifacts: {model_artifact_path}")
-            shutil.rmtree(model_artifact_path)
-
-        # Delete model artifact from local file system
-        artifact_path = os.path.join("mlflow/mlartifacts", run["experiment_id"], run["run_id"])
-        if os.path.exists(artifact_path):
-            print(f"Deleting local artifacts: {artifact_path}")
-            shutil.rmtree(artifact_path)
 
 if __name__ == "__main__":
     print(f"{'='*20} Starting model registering pipeline. {'='*20}")

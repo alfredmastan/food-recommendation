@@ -3,7 +3,6 @@ data_preprocessing:
 
 model_pipeline:
   model_path: models/fasttext.model
-  model_ngram_path: models/fasttext.model.wv.vectors_ngrams.npy
   recipe_path: data/processed_cookbook.pkl
 
   fast_text:
@@ -11,9 +10,9 @@ model_pipeline:
     window: 8
     sg: 0
     epochs: 100
-    hs: 1
     seed: 1234
     min_count: 1
+    bucket: 50000
 
   model_scoring:
     w_title: 0.2 # Weight for title similarity

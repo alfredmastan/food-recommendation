@@ -26,22 +26,21 @@ stages:
       size: 3653739
     - path: src/model_training.py
       hash: md5
-      md5: 32e4c7ffe10ccf3688bc82ae4eb84e30
-      size: 6328
+      md5: 5f4d86ea8b4258f60cf7ff945db04a38
+      size: 6194
     params:
       params.yaml:
         model_pipeline:
           model_path: models/fasttext.model
-          model_ngram_path: models/fasttext.model.wv.vectors_ngrams.npy
           recipe_path: data/processed_cookbook.pkl
           fast_text:
             vector_size: 100
             window: 8
             sg: 0
             epochs: 100
-            hs: 1
             seed: 1234
             min_count: 1
+            bucket: 50000
           model_scoring:
             w_title: 0.2
             w_cosine: 0.2
@@ -53,16 +52,12 @@ stages:
     outs:
     - path: models/fasttext.model
       hash: md5
-      md5: 2c2c42502ae1e6f5f1650b993123eee0
-      size: 12818460
-    - path: models/fasttext.model.wv.vectors_ngrams.npy
-      hash: md5
-      md5: cd7818dcd50aa8911d4e4d83a2047a45
-      size: 800000128
+      md5: e01017835b262c29c9aefe1dc87c580c
+      size: 27935088
     - path: training_metadata.json
       hash: md5
-      md5: ed617780167c6c091fe3c5b4303d20bd
-      size: 925
+      md5: 63db156bb9c5467cab2983fafffaf2c3
+      size: 858
   model_evaluation:
     cmd: python src/model_evaluation.py
     deps:
@@ -72,8 +67,8 @@ stages:
       size: 4742
     - path: training_metadata.json
       hash: md5
-      md5: ed617780167c6c091fe3c5b4303d20bd
-      size: 925
+      md5: 63db156bb9c5467cab2983fafffaf2c3
+      size: 858
     params:
       params.yaml:
         model_evaluation:
@@ -83,19 +78,19 @@ stages:
     outs:
     - path: validation_metadata.json
       hash: md5
-      md5: 9553858161da5eec6d788424baa2ab03
-      size: 1311
+      md5: fafb5f0bb4d41f6dcd5469f89ba20d61
+      size: 1231
   model_registering:
     cmd: python src/model_registering.py
     deps:
     - path: src/model_registering.py
       hash: md5
-      md5: de17d377548049e736150d74e1054fc3
-      size: 4260
+      md5: cc4fa647a411c14f744e7f1e6894a3bf
+      size: 3013
     - path: validation_metadata.json
       hash: md5
-      md5: 9553858161da5eec6d788424baa2ab03
-      size: 1311
+      md5: fafb5f0bb4d41f6dcd5469f89ba20d61
+      size: 1231
     params:
       params.yaml:
         model_register:
