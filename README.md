@@ -2,8 +2,9 @@
 
 A recommender system that gives you recipes based on ingredients you have on-hand! Simply type in **any ingredients** and select **available nutrition filters** to fit your diet.
 
-![app_preview](assets/web_preview.gif)
 The website is accessible through [here](https://food-rec.streamlit.app/).
+
+![app_preview](assets/web_preview.gif)
 
 ## Stack
 - **Frontend**: Streamlit
@@ -64,4 +65,6 @@ The model itself is wrapped under *FastAPI* as an endpoint, which is then contai
 The website is hosted through *Streamlit Community Cloud* server which automatically updates from the GitHub repository every push.
 
 ## Attribution
-All recipes belong to their respective authors: **Daily Dish Recipes**, **Just One Cookbook**, **Love and Lemons**, **Minimalist Baker**, **Omnivore’s Cookbook**, **RecipeTin Eats**, **Spoon Fork Bacon**, and **The Woks of Life**. This repository is used strictly for for **educational and research purposes**.
+All recipes belong to their respective authors: **Daily Dish Recipes**, **Just One Cookbook**, **Love and Lemons**, **Minimalist Baker**, **Omnivore’s Cookbook**, **RecipeTin Eats**, **Spoon Fork Bacon**, and **The Woks of Life**.
+
+This repository is used strictly for for **educational and research purposes**.
