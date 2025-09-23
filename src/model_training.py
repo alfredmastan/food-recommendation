@@ -1,6 +1,8 @@
 # Import required libraries
+from typing import Counter
 import numpy as np
 import pandas as pd
+from collections import Counter
 
 # Model
 import mlflow
@@ -29,9 +31,11 @@ class RecipeFastText(mlflow.pyfunc.PythonModel):
 
         # Prepare IDF
         self.idf = {}
+        ingredients_count = Counter(self.data.ingredients.explode())
+        data_length = len(self.data)
         for vocab in self.model.wv.index_to_key:
-            n_recipe_contains_vocab = self.data.ingredients.apply(lambda x: vocab in x).sum()
-            self.idf[vocab] = np.log(len(self.data.ingredients) / (n_recipe_contains_vocab + 1e-9))
+            n_recipe_contains_vocab = ingredients_count.get(vocab, 0)
+            self.idf[vocab] = np.log(data_length / (n_recipe_contains_vocab + 1e-9))
 
         # Prepare ingredient vectors
         self.ingredient_vectors = []
@@ -70,16 +74,30 @@ class RecipeFastText(mlflow.pyfunc.PythonModel):
         # Apply IDF 
         query_vecs = np.array([(query_vec * query_idf) for query_vec, query_idf in zip(query_vecs, query_idfs)])
 
+        # Calculate MaxSim for each recipe in the data
+        # Might be slow for large amount of data
+        ingredient_max_sim = np.array([])
+        for ing_vector in self.ingredient_vectors:
+            ing_vector = np.array(ing_vector)
+            tokens_sim = np.array([self.model.wv.cosine_similarities(vec, ing_vector) for vec in query_vecs])
+
+            a_best = tokens_sim.max(axis=1)
+            b_best = tokens_sim.max(axis=0)
+            
+            score = 0.5 * (a_best.mean() + b_best.mean())
+            ingredient_max_sim = np.append(ingredient_max_sim, score)
+
         # Calculate cosine similarity between the mean query vector and the mean ingredients vector
         mean_query_vec = query_vecs.mean(axis=0)
-        ingredient_sim = cosine_similarity(mean_query_vec.reshape(1, -1), self.ingredient_vector_means)
-        title_sim = cosine_similarity(mean_query_vec.reshape(1, -1), self.title_vector_means)
+        ingredient_sim = self.model.wv.cosine_similarities(mean_query_vec, self.ingredient_vector_means)
+        title_sim = self.model.wv.cosine_similarities(mean_query_vec, self.title_vector_means)
 
-        score = (self.params["model_scoring"]["w_cosine"] * ingredient_sim[0] +
-                self.params["model_scoring"]["w_title"] * title_sim[0])
+        score = (self.params["model_scoring"]["w_cosine"] * ingredient_sim +
+                self.params["model_scoring"]["w_maxsim"] * ingredient_max_sim +
+                self.params["model_scoring"]["w_title"] * title_sim)
 
         return score
-
+    
 def main():
     # Load data and params
     params = load_params()

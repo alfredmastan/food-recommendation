@@ -1,4 +1,4 @@
-artifact_path: mlflow-artifacts:/133055071910514833/models/m-175d74a86fd74ad6ad68568802d32d26/artifacts
+artifact_path: mlflow-artifacts:/248198540795339993/models/m-4c92028dc231403bb0ab7440c5a49687/artifacts
 flavors:
   python_function:
     artifacts:
@@ -19,14 +19,14 @@ flavors:
     streamable: false
 is_signature_from_type_hint: true
 mlflow_version: 3.1.1
-model_id: m-175d74a86fd74ad6ad68568802d32d26
-model_size_bytes: 118791564
-model_uuid: m-175d74a86fd74ad6ad68568802d32d26
+model_id: m-4c92028dc231403bb0ab7440c5a49687
+model_size_bytes: 118792288
+model_uuid: m-4c92028dc231403bb0ab7440c5a49687
 prompts: null
-run_id: 7a3520ac4afc4c22906ba5436f37e972
+run_id: 270a711a9f0e400b9282a56704c36193
 signature:
   inputs: '[{"type": "string", "required": true}]'
   outputs: '[{"type": "double", "required": true}]'
   params: null
 type_hint_from_example: false
-utc_time_created: '2025-09-22 06:57:46.471498'
+utc_time_created: '2025-09-23 23:55:55.879697'

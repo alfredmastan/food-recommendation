@@ -120,7 +120,7 @@ def update_filters():
                 mask = mask.intersection(data[data[col] <= threshold].index.to_numpy())
             else:
                 mask = mask.intersection(data[data[col] >= threshold].index.to_numpy())
-
+    
     st.session_state["filter_mask"] = list(mask) # Convert to list for indexing
     st.session_state["page"] = 0 # Reset to first page
     display_recommendations() # Update the displayed recommendations based on the new filter
@@ -177,7 +177,7 @@ if st.session_state.scroll_to_top:
     scroll_to_here(0, key='top')  # Scroll to the top of the page
     st.session_state.scroll_to_top = False  # Reset the state after scrolling
 
-st.markdown("<p style='text-align: center; font-size: 300%; font-weight: bold;'>Food Recipe Recommendation</p><br>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-weight: bold;'>Food Recipe Recommendation</h1><br>", unsafe_allow_html=True)
 
 # Input section
 input_cols = st.columns(2)

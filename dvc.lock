@@ -26,8 +26,8 @@ stages:
       size: 3653739
     - path: src/model_training.py
       hash: md5
-      md5: b223389f9154c94019ccabac3755324f
-      size: 5667
+      md5: a89efc035f2dc02e0129b2949ad97531
+      size: 6457
     params:
       params.yaml:
         model_pipeline:
@@ -42,8 +42,9 @@ stages:
             min_count: 1
             bucket: 50000
           model_scoring:
-            w_title: 0.1
-            w_cosine: 0.9
+            w_title: 0.2
+            w_cosine: 0.2
+            w_maxsim: 0.6
             idf_top_weights:
             - 0.8
             - 0.1
@@ -51,12 +52,12 @@ stages:
     outs:
     - path: models/fasttext.model
       hash: md5
-      md5: d17310fa0e471c4ae925453f885ed855
-      size: 27935088
+      md5: 206207d1af3e387adee7f879fb5f33b2
+      size: 27935087
     - path: training_metadata.json
       hash: md5
-      md5: d85d9c2d34c5da264183ea0569da301d
-      size: 829
+      md5: a8ff6ac25dfafb5800de3c4f19b4c77f
+      size: 858
   model_evaluation:
     cmd: python src/model_evaluation.py
     deps:
@@ -66,8 +67,8 @@ stages:
       size: 4742
     - path: training_metadata.json
       hash: md5
-      md5: d85d9c2d34c5da264183ea0569da301d
-      size: 829
+      md5: a8ff6ac25dfafb5800de3c4f19b4c77f
+      size: 858
     params:
       params.yaml:
         model_evaluation:
@@ -77,8 +78,8 @@ stages:
     outs:
     - path: validation_metadata.json
       hash: md5
-      md5: 7f59e1778561c454e288d31829d2972e
-      size: 1203
+      md5: 37ced4cdfb96d7d10f46c82129d615df
+      size: 1231
   model_registering:
     cmd: python src/model_registering.py
     deps:
@@ -88,8 +89,8 @@ stages:
       size: 3013
     - path: validation_metadata.json
       hash: md5
-      md5: 7f59e1778561c454e288d31829d2972e
-      size: 1203
+      md5: 37ced4cdfb96d7d10f46c82129d615df
+      size: 1231
     params:
       params.yaml:
         model_register:
