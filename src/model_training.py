@@ -7,7 +7,6 @@ from collections import Counter
 # Model
 import mlflow
 from gensim.models import FastText
-from sklearn.metrics.pairwise import cosine_similarity
 
 # Logging
 import os 
