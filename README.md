@@ -15,7 +15,7 @@ The website is accessible through [here](https://food-rec.streamlit.app/).
 
 ## Local Run
 **Dependencies:**
-Install `requirements.txt` in your virtual environment. The app only depends on the model's API, while executing the pipeline will also require *MLflow* tracking server to be running. 
+Install `pipeline-requirements.txt` in your virtual environment. The app only depends on the model's API, while executing the pipeline will also require *MLflow* tracking server to be running. 
 
 There are two ways to run all the dependencies:
 - **Shell script**
@@ -59,6 +59,7 @@ The similarity scored is calculated by combining two similarities:
 - **MaxSim Similarity**: The average of maximum cosine similarity between each input and each ingredients in every recipes and vice versa. Simply compares the ingredients word by word instead of the averaged vectors
 
 The similarities are then added as such: 
+
 `similarity = 0.2 * ingredient_sim + 0.2 * title_sim + 0.6 * max_sim`
 
 ## Deployment 
