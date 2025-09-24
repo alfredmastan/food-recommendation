@@ -56,8 +56,10 @@ On top of the model, techniques like *Inverse Document Frequency (IDF)* are furt
 The similarity scored is calculated by combining two similarities:
 - **Ingredient Similarity**: *cosine similarity* between averaged vectors in the input query and averaged vectors in the recipe ingredients.
 - **Title Similarity**: *cosine similarity* between averaged vectors in the input query and the averaged vectors in the recipe title.
+- **MaxSim Similarity**: The average of maximum cosine similarity between each input and each ingredients in every recipes and vice versa. Simply compares the ingredients word by word instead of the averaged vectors
 
-The similarities are then added as such: `similarity = 0.9 * ingredient_sim + 0.1 * title_sim`
+The similarities are then added as such: 
+`similarity = 0.2 * ingredient_sim + 0.2 * title_sim + 0.6 * max_sim`
 
 ## Deployment 
 The model itself is wrapped under *FastAPI* as an endpoint, which is then containerized by *Docker*, pushed into *AWS ECR*, and deployed using *AWS EC2* server. This is performed automatically using CI/CD from *GitHub Actions* every new push on the branch.
